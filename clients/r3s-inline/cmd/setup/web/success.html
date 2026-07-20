@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vertex R3S — настройка завершена</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<main>
+  {{if .SaveOnly}}
+    <h1>Настройки сохранены</h1>
+    <p class="lede">Конфигурация записана на диск, сервисы НЕ перезапускались.</p>
+
+    <h2>Что дальше</h2>
+    <ol>
+      <li>Выключите R3S (отключите питание).</li>
+      <li>Перенесите устройство в целевую сеть.</li>
+      <li>Подключите кабели: ISP → <code>eth0</code>, ваш роутер → <code>eth1</code>.</li>
+      <li>Включите питание. Через ~60 секунд VPN поднимется автоматически с новой конфигурацией.</li>
+    </ol>
+
+    <p class="note">Если на новом месте что-то пойдёт не так — <code>http://192.168.42.1/</code> снова доступен с устройства за вашим роутером (на новом месте, не сейчас). Откройте, отредактируйте, сохраните.</p>
+
+    <p class="note">Для диагностики при подозрениях на ошибку (доступ к R3S по SSH через eth1):
+    <code>sudo journalctl -u vtx-inline-wan -e</code> (PPPoE/DHCP),
+    <code>sudo journalctl -u vtx-inline-router -e</code> (VPN-туннель).</p>
+  {{else}}
+    <h1>Готово</h1>
+    <p class="lede">R3S подключается к VPN. Через минуту проверьте интернет на роутере.</p>
+
+    <h2>Что дальше</h2>
+    <ol>
+      <li>Перезагрузите ваш роутер (или подождите пока он сам обновит DNS-сессии).</li>
+      <li>На устройстве за роутером откройте <a href="https://api.ipify.org/" target="_blank">https://api.ipify.org</a> — IP должен быть зарубежный (не вашего провайдера).</li>
+      <li>Откройте <a href="https://yandex.ru/ping" target="_blank">https://yandex.ru/ping</a> — должно работать быстро (RU-трафик идёт напрямую).</li>
+    </ol>
+
+    <p class="note warn">Если вы отправляли форму по Wi-Fi — пароли передавались по незашифрованному HTTP. Рекомендуем сменить пароль точки доступа на вашем роутере (на случай, если рядом кто-то перехватил Wi-Fi-кадры).</p>
+
+    <p class="note">Если переедете на другую сеть/провайдера — этот URL (<code>http://192.168.42.1/</code>) всегда доступен с eth1-стороны для смены настроек.</p>
+  {{end}}
+</main>
+</body>
+</html>

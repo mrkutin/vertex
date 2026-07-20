@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>Vertex.Core.Tests</RootNamespace>
+    <AssemblyName>Vertex.Core.Tests</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.*" />
+    <PackageReference Include="xunit" Version="2.*" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.*" />
+    <PackageReference Include="FluentAssertions" Version="6.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vertex.Core\Vertex.Core.csproj" />
+    <ProjectReference Include="..\Vertex.Shared\Vertex.Shared.csproj" />
+  </ItemGroup>
+
+  <!--
+    Microsoft.NET.Test.Sdk 17.14 only ships x64/x86 testhost.exe — on
+    Windows ARM64 the test process runs under xtajit x64 emulation, and
+    NSec's [DllImport("libsodium")] therefore needs the win-x64 native dll
+    next to the assembly (not the host's win-arm64 build).
+
+    On x64 hosts the legacy RID graph already resolves the dll via
+    runtimes/win-x64/native/, so this copy is redundant but harmless.
+
+    When Microsoft eventually ships an ARM64 testhost (none in 17.14),
+    update VSTestArchitecture detection here. Production Service
+    publishes per-RID so this only affects the test pipeline.
+  -->
+  <Target Name="CopyLibsodiumNextToTestHost" AfterTargets="Build">
+    <PropertyGroup>
+      <_VxTestRid Condition="'$(VSTestArchitecture)' == 'arm64'">win-arm64</_VxTestRid>
+      <_VxTestRid Condition="'$(_VxTestRid)' == ''">win-x64</_VxTestRid>
+    </PropertyGroup>
+    <ItemGroup>
+      <_VxLibsodium Include="$(OutDir)runtimes\$(_VxTestRid)\native\libsodium.dll" />
+    </ItemGroup>
+    <Copy
+      SourceFiles="@(_VxLibsodium)"
+      DestinationFolder="$(OutDir)"
+      SkipUnchangedFiles="true"
+      Condition="'@(_VxLibsodium)' != ''" />
+  </Target>
+
+</Project>

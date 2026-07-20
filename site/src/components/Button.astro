@@ -1,0 +1,102 @@
+---
+/**
+ * Vertex button — used as anchor (with `href`) or as a plain element.
+ * Variants: primary (filled accent), ghost (bordered), link (underline).
+ * Always renders an <a> when `href` is provided, else a <button>.
+ */
+import Icon, { type IconName } from './Icon.astro';
+
+interface Props {
+  href?: string;
+  variant?: 'primary' | 'ghost' | 'link';
+  size?: 'md' | 'lg';
+  icon?: IconName;
+  iconAfter?: IconName;
+  external?: boolean;
+  class?: string;
+  type?: 'button' | 'submit';
+  ariaLabel?: string;
+}
+
+const {
+  href,
+  variant = 'primary',
+  size = 'md',
+  icon,
+  iconAfter,
+  external = false,
+  class: className,
+  type = 'button',
+  ariaLabel,
+} = Astro.props;
+
+const classes = ['vx-btn', `vx-btn-${variant}`, `vx-btn-${size}`, className].filter(Boolean).join(' ');
+const externalAttrs = external
+  ? { rel: 'noopener noreferrer', target: '_blank' as const }
+  : {};
+---
+
+{href ? (
+  <a href={href} class={classes} aria-label={ariaLabel} {...externalAttrs}>
+    {icon && <Icon name={icon} size={16} />}
+    <span><slot /></span>
+    {iconAfter && <Icon name={iconAfter} size={16} />}
+  </a>
+) : (
+  <button type={type} class={classes} aria-label={ariaLabel}>
+    {icon && <Icon name={icon} size={16} />}
+    <span><slot /></span>
+    {iconAfter && <Icon name={iconAfter} size={16} />}
+  </button>
+)}
+
+<style>
+  .vx-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    border-radius: 999px;
+    font-weight: 600;
+    transition: background 150ms ease, color 150ms ease, border-color 150ms ease, transform 150ms ease;
+    white-space: nowrap;
+  }
+  .vx-btn-md {
+    height: 44px;
+    padding: 0 1.15rem;
+    font-size: 0.95rem;
+  }
+  .vx-btn-lg {
+    height: 52px;
+    padding: 0 1.5rem;
+    font-size: 1rem;
+  }
+
+  .vx-btn-primary {
+    background: var(--vx-accent);
+    color: var(--vx-text-on-accent);
+  }
+  .vx-btn-primary:hover {
+    background: var(--vx-accent-hover);
+  }
+
+  .vx-btn-ghost {
+    border: 1px solid var(--vx-border-strong);
+    color: var(--vx-text-primary);
+    background: transparent;
+  }
+  .vx-btn-ghost:hover {
+    background: var(--vx-bg-surface-muted);
+    border-color: var(--vx-accent);
+  }
+
+  .vx-btn-link {
+    height: auto;
+    padding: 0;
+    color: var(--vx-accent);
+    border-radius: 0;
+  }
+  .vx-btn-link:hover {
+    color: var(--vx-accent-hover);
+  }
+</style>

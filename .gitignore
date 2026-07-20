@@ -1,0 +1,21 @@
+# Build artifacts
+/dist/
+*.exe
+
+# Secrets
+CREDENTIALS.md
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+.claude/
+
+# Xcode
+clients/ios/Vertex/Frameworks/
+
+# Test runtime artifacts
+test/docker/invite-log/
+test/docker/qr-output/

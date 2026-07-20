@@ -1,0 +1,136 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import FeatureSection from '../components/FeatureSection.astro';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const sections = [
+  {
+    icon: 'lock' as const,
+    heading: t('features.e2e.heading'),
+    body: t('features.e2e.body'),
+    details: [
+      t('features.e2e.detail1'),
+      t('features.e2e.detail2'),
+      t('features.e2e.detail3'),
+      t('features.e2e.detail4'),
+      t('features.e2e.detail5'),
+    ],
+    monoBlock: 'session_key = derive(client_pub || exit_pub)\nciphertext, auth_tag = seal(session_key, nonce, plaintext)',
+  },
+  {
+    icon: 'network' as const,
+    heading: t('features.vertex.heading'),
+    body: t('features.vertex.body'),
+    details: [
+      t('features.vertex.detail1'),
+      t('features.vertex.detail2'),
+      t('features.vertex.detail3'),
+      t('features.vertex.detail4'),
+      t('features.vertex.detail5'),
+    ],
+    monoBlock: 'vertices = [\n  v0,  // primary\n  v1,  // backup\n  ...  // additional standalone vertices\n]\n# ordered failover, sticky to last-good',
+  },
+  {
+    icon: 'zap' as const,
+    heading: t('features.exit.heading'),
+    body: t('features.exit.body'),
+    details: [
+      t('features.exit.detail1'),
+      t('features.exit.detail2'),
+      t('features.exit.detail3'),
+      t('features.exit.detail4'),
+      t('features.exit.detail5'),
+    ],
+    monoBlock: 'score(exit) = rtt + load_penalty\npick min(score) over reachable exits',
+  },
+  {
+    icon: 'shield' as const,
+    heading: t('features.identity.heading'),
+    body: t('features.identity.body'),
+    details: [
+      t('features.identity.detail1'),
+      t('features.identity.detail2'),
+      t('features.identity.detail3'),
+      t('features.identity.detail4'),
+      t('features.identity.detail5'),
+    ],
+    monoBlock: 'shared = ECDH(identity_priv, exit_pub)\nproof  = HMAC-SHA256(shared, device_label)',
+  },
+  {
+    icon: 'git-branch' as const,
+    heading: t('features.split.heading'),
+    body: t('features.split.body'),
+    details: [
+      t('features.split.detail1'),
+      t('features.split.detail2'),
+      t('features.split.detail3'),
+      t('features.split.detail4'),
+      t('features.split.detail5'),
+    ],
+    monoBlock: '# RU CIDR set, sample\n2.56.0.0/16, 31.13.144.0/21, 77.88.0.0/18, 87.250.224.0/19, 213.180.192.0/19, ...',
+  },
+  {
+    icon: 'globe' as const,
+    heading: t('features.dpi.heading'),
+    body: t('features.dpi.body'),
+    details: [
+      t('features.dpi.detail1'),
+      t('features.dpi.detail2'),
+      t('features.dpi.detail3'),
+      t('features.dpi.detail4'),
+      t('features.dpi.detail5'),
+    ],
+    monoBlock: 'transport: prefer → standard\n           fallback → web-stream\n           mode      → adaptive',
+  },
+];
+---
+
+<BaseLayout title={t('features.title')} description={t('features.lede')}>
+  <div class="vx-features-page vx-container">
+    <header class="vx-feat-page-head">
+      <h1>{t('features.heading')}</h1>
+      <p>{t('features.lede')}</p>
+    </header>
+    <div class="vx-feat-stack">
+      {sections.map((s, i) => (
+        <FeatureSection
+          icon={s.icon}
+          heading={s.heading}
+          body={s.body}
+          details={s.details}
+          monoBlock={s.monoBlock}
+          reverse={i % 2 === 1}
+        />
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .vx-features-page {
+    padding-top: clamp(2.5rem, 6vw, 4.5rem);
+    padding-bottom: clamp(3rem, 6vw, 5rem);
+  }
+  .vx-feat-page-head {
+    text-align: center;
+    max-width: 65ch;
+    margin: 0 auto 3rem;
+  }
+  .vx-feat-page-head h1 {
+    font-size: var(--vx-fs-h1);
+    letter-spacing: -0.015em;
+  }
+  .vx-feat-page-head p {
+    margin-top: 1rem;
+    color: var(--vx-text-secondary);
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+  .vx-feat-stack {
+    display: flex;
+    flex-direction: column;
+  }
+</style>

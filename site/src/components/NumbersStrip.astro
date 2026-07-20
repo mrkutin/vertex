@@ -1,0 +1,93 @@
+---
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const items = [
+  {
+    value: t('numbers.throughput.value'),
+    unit: t('numbers.throughput.unit'),
+    label: t('numbers.throughput.label'),
+  },
+  {
+    value: t('numbers.failover.value'),
+    unit: t('numbers.failover.unit'),
+    label: t('numbers.failover.label'),
+  },
+  {
+    value: t('numbers.split.value'),
+    unit: t('numbers.split.unit'),
+    label: t('numbers.split.label'),
+  },
+];
+---
+
+<section class="vx-numbers vx-container" aria-label="Key performance indicators">
+  <ul role="list" class="vx-numbers-grid">
+    {items.map((item) => (
+      <li class="vx-num">
+        <span class="vx-num-value">
+          <span class="vx-num-figure">{item.value}</span>
+          <span class="vx-num-unit">{item.unit}</span>
+        </span>
+        <span class="vx-num-label">{item.label}</span>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .vx-numbers {
+    padding-top: clamp(1.5rem, 3vw, 2.5rem);
+    padding-bottom: clamp(1.5rem, 3vw, 2.5rem);
+    border-top: 1px solid var(--vx-border-subtle);
+    border-bottom: 1px solid var(--vx-border-subtle);
+  }
+
+  .vx-numbers-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    list-style: none;
+  }
+
+  @media (min-width: 640px) {
+    .vx-numbers-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+  }
+
+  .vx-num {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .vx-num-value {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+  }
+
+  .vx-num-figure {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: clamp(1.6rem, 1.2rem + 1.2vw, 2.25rem);
+    font-weight: 600;
+    color: var(--vx-text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .vx-num-unit {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.95rem;
+    color: var(--vx-accent);
+    letter-spacing: 0.04em;
+  }
+
+  .vx-num-label {
+    color: var(--vx-text-tertiary);
+    font-size: 0.88rem;
+  }
+</style>

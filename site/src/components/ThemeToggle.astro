@@ -1,0 +1,82 @@
+---
+import Icon from './Icon.astro';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<button
+  type="button"
+  class="vx-theme-toggle"
+  data-vx-theme-toggle
+  aria-label={t('theme.toggle')}
+  title={t('theme.toggle')}
+>
+  <Icon name="sun" size={18} class="vx-theme-icon vx-theme-icon-sun" />
+  <Icon name="moon" size={18} class="vx-theme-icon vx-theme-icon-moon" />
+</button>
+
+<style>
+  .vx-theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    color: var(--vx-text-secondary);
+    border: 1px solid var(--vx-border-subtle);
+    background: transparent;
+    transition: color 150ms ease, border-color 150ms ease, background 150ms ease;
+  }
+
+  .vx-theme-toggle:hover {
+    color: var(--vx-text-primary);
+    border-color: var(--vx-border-strong);
+    background: var(--vx-bg-surface-muted);
+  }
+
+  :global(.vx-theme-icon) {
+    transition: transform 200ms ease;
+  }
+
+  /* Dark theme — show sun (offer "go light"), hide moon. */
+  :global(:root[data-theme='dark']) :global(.vx-theme-icon-moon) {
+    display: none;
+  }
+  /* Light theme — show moon (offer "go dark"), hide sun. */
+  :global(:root[data-theme='light']) :global(.vx-theme-icon-sun) {
+    display: none;
+  }
+
+  .vx-theme-toggle:hover :global(.vx-theme-icon) {
+    transform: rotate(15deg);
+  }
+</style>
+
+<script>
+  (() => {
+    const STORAGE_KEY = 'vertex-theme';
+    const root = document.documentElement;
+
+    function current(): 'light' | 'dark' {
+      return root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    }
+
+    function apply(theme: 'light' | 'dark') {
+      root.setAttribute('data-theme', theme);
+      try {
+        localStorage.setItem(STORAGE_KEY, theme);
+      } catch {
+        /* private mode / disabled storage — ignore */
+      }
+    }
+
+    document.querySelectorAll<HTMLButtonElement>('[data-vx-theme-toggle]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        apply(current() === 'light' ? 'dark' : 'light');
+      });
+    });
+  })();
+</script>

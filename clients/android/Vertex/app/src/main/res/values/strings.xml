@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Vertex</string>
+    <string name="brand_wordmark">VERTEX</string>
+
+    <!-- Connect screen -->
+    <string name="status_disconnected">Not connected</string>
+    <string name="status_connecting">Connecting…</string>
+    <string name="status_handshaking">Handshaking…</string>
+    <string name="status_connected">Connected</string>
+    <string name="status_reconnecting">Reconnecting…</string>
+    <string name="action_connect">Connect</string>
+    <string name="action_disconnect">Disconnect</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_section_identity">Identity</string>
+    <string name="settings_field_client_name">Client name</string>
+    <string name="settings_field_password">Password</string>
+    <string name="settings_section_brokers">Vertices</string>
+    <string name="settings_section_exit">Edges</string>
+    <string name="settings_section_about">About</string>
+    <string name="settings_link_identity_key">Identity Key</string>
+    <string name="settings_link_about">About</string>
+    <string name="settings_link_diagnostics">Diagnostics</string>
+
+    <!-- Identity Key -->
+    <string name="identity_title">Identity Key</string>
+    <string name="identity_explain">A persistent X25519 keypair that proves this device. The private key never leaves this device.</string>
+    <string name="identity_action_copy">Copy public key</string>
+    <string name="identity_action_reset">Reset</string>
+
+    <!-- About -->
+    <string name="about_title">About</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_copyright">Vertex — where paths meet.</string>
+
+    <!-- Permission -->
+    <string name="perm_title">Permission required</string>
+    <string name="perm_vpn_explain">Vertex needs permission to create a VPN connection so it can route traffic through the Edge node.</string>
+    <string name="perm_notif_explain">Vertex shows a status notification while the VPN is active.</string>
+    <string name="perm_grant">Grant</string>
+
+    <!-- Foreground service notification -->
+    <string name="notif_channel_name">Vertex VPN</string>
+    <string name="notif_channel_description">VPN connection status</string>
+    <string name="notif_text_connected">Connected via %1$s (%2$s)</string>
+    <string name="notif_text_connecting">Connecting…</string>
+    <string name="notif_action_disconnect">Disconnect</string>
+
+    <!-- Quick Settings tile -->
+    <string name="quick_tile_label">Vertex</string>
+    <string name="quick_tile_subtitle_disconnected">Off</string>
+    <string name="quick_tile_subtitle_connecting">Connecting…</string>
+    <string name="quick_tile_subtitle_connected">Connected</string>
+</resources>

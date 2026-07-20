@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="Vertex.App.Controls.ServerCard"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:glyphs="using:Vertex.App.Controls.Glyphs">
+
+    <Border Background="{StaticResource BgSurfaceBrush}"
+            BorderBrush="{StaticResource BorderSubtleBrush}"
+            BorderThickness="0.5"
+            CornerRadius="{StaticResource Vx_r_lg}"
+            HorizontalAlignment="Stretch">
+        <StackPanel>
+
+            <!-- Vertex (Broker) row -->
+            <Button x:Name="BrokerRow"
+                    Click="OnBrokerClick"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch"
+                    Padding="16,14">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <glyphs:VxAsteriskGlyph Grid.Column="0" GlyphSize="22" VerticalAlignment="Center"/>
+                    <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                        <TextBlock Text="Vertex"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   FontSize="13"/>
+                        <TextBlock x:Name="VertexValue"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   FontSize="15"
+                                   FontWeight="Medium"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                    <TextBlock x:Name="VertexCode"
+                               Grid.Column="2"
+                               Foreground="{StaticResource TextTertiaryBrush}"
+                               FontFamily="Consolas"
+                               FontSize="12"
+                               VerticalAlignment="Center"
+                               Margin="0,0,8,0"/>
+                    <FontIcon Grid.Column="3"
+                              Glyph="&#xE76C;"
+                              FontSize="12"
+                              Foreground="{StaticResource TextTertiaryBrush}"
+                              VerticalAlignment="Center"/>
+                </Grid>
+            </Button>
+
+            <!-- Hairline divider, indented to align under text -->
+            <Border Background="{StaticResource BorderSubtleBrush}"
+                    Height="0.5"
+                    Margin="56,0,0,0"/>
+
+            <!-- Edge (Exit) row -->
+            <Button x:Name="ExitRow"
+                    Click="OnExitClick"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch"
+                    Padding="16,14">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <glyphs:VxEdgeGlyph Grid.Column="0" GlyphSize="22" VerticalAlignment="Center"/>
+                    <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                        <TextBlock Text="Edge"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   FontSize="13"/>
+                        <TextBlock x:Name="EdgeValue"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   FontSize="15"
+                                   FontWeight="Medium"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                    <TextBlock x:Name="EdgeCode"
+                               Grid.Column="2"
+                               Foreground="{StaticResource TextTertiaryBrush}"
+                               FontFamily="Consolas"
+                               FontSize="12"
+                               VerticalAlignment="Center"
+                               Margin="0,0,8,0"/>
+                    <FontIcon Grid.Column="3"
+                              Glyph="&#xE76C;"
+                              FontSize="12"
+                              Foreground="{StaticResource TextTertiaryBrush}"
+                              VerticalAlignment="Center"/>
+                </Grid>
+            </Button>
+
+        </StackPanel>
+    </Border>
+</UserControl>

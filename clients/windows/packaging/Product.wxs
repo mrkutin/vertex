@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Vertex VPN — WiX 4/6 installer manifest.
+
+    Per-platform UpgradeCode: x64 and arm64 are *separate* products
+    from Windows Installer's POV. Never reuse a UpgradeCode across
+    architectures or you'll get a partial-overwrite mess.
+
+    Acceptance criteria for Phase 5 — see clients/windows/PLAN.md:367-379.
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+
+  <?if $(VertexPlatform)="x64"?>
+    <?define UpgradeGuid = "3DA6B34C-18EB-4268-824B-CDCA0F031680"?>
+  <?elseif $(VertexPlatform)="ARM64"?>
+    <?define UpgradeGuid = "C98E09CC-2F4B-4D0C-8BEF-5C61FE601419"?>
+  <?else?>
+    <?error VertexPlatform must be x64 or ARM64. Pass `-p:Platform=x64` or `-p:Platform=ARM64` to dotnet build, or run via tools/make.ps1 msi-amd64 / msi-arm64.?>
+  <?endif?>
+
+  <Package Name="!(loc.ProductName)"
+           Manufacturer="!(loc.Manufacturer)"
+           Version="!(bind.FileVersion.VertexServiceExe)"
+           UpgradeCode="$(UpgradeGuid)"
+           Scope="perMachine"
+           Compressed="yes">
+
+    <SummaryInformation Description="!(loc.PackageDescription)" />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <!--
+        Stop service → replace files → start service. Schedule afterInstallExecute
+        so RemoveExistingProducts runs *after* InstallFiles, letting
+        ServiceControl Stop="both" Wait="yes" pause the live tunnel before
+        the .exe is overwritten.
+    -->
+    <MajorUpgrade AllowDowngrades="no"
+                  AllowSameVersionUpgrades="yes"
+                  DowngradeErrorMessage="!(loc.DowngradeError)"
+                  Schedule="afterInstallExecute"
+                  IgnoreRemoveFailure="no" />
+
+    <!-- 64-bit Windows kernel (we don't ship x86). The Win10 1903 floor
+         (for ChaCha20Poly1305 in .NET BCL) is enforced by .NET 8 itself
+         at Service startup — adding `WindowsBuild >= 18362` here trips
+         on ARM64 Win11 hosts running x64 MSI under WoW emulation, where
+         WindowsBuild surfaces as 0/empty in the MSI property bag and
+         the install bails with a misleading "requires 1903" message
+         even on Windows 11. Acceptable trade: a Win10 1809 user gets a
+         clearer .NET error from Service rather than a cryptic MSI
+         block, and the modal target (Win 10/11 64-bit) is unchanged. -->
+    <Launch Condition="Installed OR VersionNT64"
+            Message="!(loc.MinWinError)" />
+
+    <!-- ARP (Add/Remove Programs) entry. -->
+    <Property Id="ARPPRODUCTICON" Value="VertexIcon.ico" />
+    <Property Id="ARPURLINFOABOUT" Value="https://vertices.ru" />
+    <Property Id="ARPHELPLINK" Value="https://vertices.ru" />
+    <Property Id="ARPNOMODIFY" Value="yes" />
+    <Icon Id="VertexIcon.ico" SourceFile="Files\Vertex.ico" />
+
+    <!-- Install layout.
+         %ProgramFiles%\Vertex\
+             Vertex.Service.exe + wintun.dll + libsodium.dll + Resources\
+             App\
+                 Vertex.App.exe + WinUI/CLR/MVVM runtime DLLs
+         The App\ subdirectory lets the Files glob harvest the WinUI
+         payload without colliding with Vertex.App.exe declared as a
+         keypath File in VertexAppComp (WiX 6 Files element has no
+         Exclude attribute). -->
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="VertexFolder" Name="Vertex">
+        <Directory Id="VertexAppSubdir" Name="App" />
+      </Directory>
+    </StandardDirectory>
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="VertexShortcutFolder" Name="Vertex" />
+    </StandardDirectory>
+    <StandardDirectory Id="CommonAppDataFolder">
+      <!--
+          %ProgramData%\Vertex — Service writes here at runtime
+          (identity.bin, password.bin, state.json, logs, the refreshed
+          ru-aggregated.zone). Created by the installer so first-run
+          permissions are right; Service-side code uses the same path.
+      -->
+      <Directory Id="VertexDataFolder" Name="Vertex" />
+    </StandardDirectory>
+
+    <!-- ============================================================
+         Service component: Service.exe + bundled WinTUN driver +
+         ServiceInstall / ServiceConfig / ServiceControl in one block.
+         WinTUN MUST live next to Service.exe (LoadLibrary("wintun.dll")
+         resolves from the exe's directory). System32 is *not* allowed
+         per WinTUN's own docs — the dll has its own EV-attested driver
+         resource embedded; copying it next to the host binary is the
+         supported deployment.
+         ============================================================ -->
+    <ComponentGroup Id="VertexServiceGroup" Directory="VertexFolder">
+
+      <!-- Service.exe owns ServiceInstall/ServiceControl. WiX requires
+           the service-managed file to be its Component's KeyPath. -->
+      <Component Id="VertexServiceComp" Bitness="always64">
+        <File Id="VertexServiceExe"
+              Source="$(ServiceExeDir)\Vertex.Service.exe"
+              KeyPath="yes" />
+
+        <ServiceInstall Id="VertexVPNServiceInstall"
+                        Name="VertexVPN"
+                        DisplayName="!(loc.ServiceDisplayName)"
+                        Description="!(loc.ServiceDescription)"
+                        Type="ownProcess"
+                        Start="auto"
+                        Account="LocalSystem"
+                        ErrorControl="normal"
+                        Vital="yes">
+          <ServiceDependency Id="Tcpip" />
+          <ServiceDependency Id="Dnscache" />
+          <!-- util:ServiceConfig in WiX 6 covers Restart/Restart/Restart
+               failure actions like WireGuard's TUN-owning daemon.
+               TODO post-MVP: DelayedAutoStart and ServiceSidType="restricted"
+               via native <ServiceConfig> + <NoWarn>WIX1149</NoWarn> in
+               the wixproj. Skipped now because the MSI SDK marks the
+               native element "not [working] as expected" and WiX 6
+               surfaces that as a build error by default. The plain
+               Start="auto" + LocalSystem boot is fine for first
+               release; tightening can be a Phase 5.5 polish pass. -->
+          <util:ServiceConfig FirstFailureActionType="restart"
+                              SecondFailureActionType="restart"
+                              ThirdFailureActionType="restart"
+                              ResetPeriodInDays="1"
+                              RestartServiceDelayInSeconds="5" />
+        </ServiceInstall>
+
+        <ServiceControl Id="VertexVPNServiceControl"
+                        Name="VertexVPN"
+                        Start="install"
+                        Stop="both"
+                        Remove="uninstall"
+                        Wait="yes" />
+      </Component>
+
+      <!-- WinTUN driver in its own Component (needed because both
+           wintun.dll and Service.exe are versioned binaries — WiX
+           refuses '*' Guids on a Component with multiple versioned
+           files). KeyPath='yes' anchors the component. -->
+      <Component Id="VertexServiceWintunComp" Bitness="always64">
+        <File Id="WintunDll"
+              Source="$(WintunDll)"
+              Name="wintun.dll"
+              KeyPath="yes" />
+      </Component>
+
+      <!-- libsodium.dll is the only native dependency that 'dotnet publish
+           -p:PublishSingleFile=true' leaves outside the bundle (NSec
+           imports it via DllImport at runtime). Resources/ holds CLR
+           satellite localisations. PDBs / .deps / .runtimeconfig don't
+           ship — symbols stay in the build artifact archive. -->
+      <Component Id="VertexServiceLibsodium" Bitness="always64">
+        <File Id="LibsodiumDll" Source="$(ServiceExeDir)\libsodium.dll" KeyPath="yes" />
+      </Component>
+
+      <Files Include="$(ServiceExeDir)\Resources\**\*" />
+    </ComponentGroup>
+
+    <!-- ============================================================
+         App (WinUI 3) component: App.exe + start-menu shortcut + the
+         rest of the WinUI/.NET runtime files via Files glob.
+         ============================================================ -->
+    <ComponentGroup Id="VertexAppGroup" Directory="VertexAppSubdir">
+      <!-- Whole App publish (CLR runtime + WinUI 3 + CommunityToolkit.Mvvm
+           + libsodium + Vertex.App.exe + Resources\*). WiX 6 <Files> has
+           no Exclude attribute, so Vertex.App.exe is harvested by the
+           glob — the Start-menu shortcut lives in its own Component
+           below pointing at the harvested .exe by file path. -->
+      <Files Include="$(AppExeDir)\**\*" />
+    </ComponentGroup>
+
+    <!-- Stand-alone Start-menu shortcut. RegistryValue is the KeyPath
+         (per-user HKCU so the uninstaller can clean it without UAC),
+         and the Shortcut's Target points at the harvested App.exe via
+         a directory token. RemoveFolder cleans up the empty Vertex\
+         programs subfolder on uninstall. -->
+    <ComponentGroup Id="VertexAppShortcutGroup" Directory="VertexShortcutFolder">
+      <Component Id="VertexAppShortcut" Guid="A4B0F6E1-7D6F-4F56-9C9D-8B0CFA7E0001">
+        <Shortcut Id="VertexStartMenuShortcut"
+                  Name="!(loc.ProductName)"
+                  Description="!(loc.AppShortcutDescription)"
+                  Target="[VertexAppSubdir]Vertex.App.exe"
+                  WorkingDirectory="VertexAppSubdir"
+                  Icon="VertexIcon.ico" />
+        <RemoveFolder Id="RemoveVertexShortcutFolder" On="uninstall" />
+        <RegistryValue Root="HKCU"
+                       Key="Software\Vertex\Installed"
+                       Name="StartMenu"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <!-- ============================================================
+         Writable %ProgramData%\Vertex — bundled RU CIDR snapshot +
+         empty placeholder so the directory exists with the right ACL
+         from first run. SplitRouter atomically replaces the .zone on
+         ipdeny refresh; identity.bin / password.bin / state.json /
+         logs are created by Service at runtime, not bundled.
+         ============================================================ -->
+    <ComponentGroup Id="VertexDataGroup" Directory="VertexDataFolder">
+      <Component Id="RuNetsZoneComp">
+        <!-- LocalSystem (Service account) is the writer — it inherits
+             write from CommonAppDataFolder's default DACL. BUILTIN\Users
+             also inherit read+execute from there, which is what we want
+             (admins debugging the .zone file). No PermissionEx tweak
+             needed — the inherited DACL matches WireGuard-Windows and
+             Mullvad's %ProgramData% layouts. -->
+        <File Id="RuNetsZone"
+              Source="$(RuNetsZone)"
+              Name="ru-aggregated.zone"
+              KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <!-- ============================================================
+         Single feature — no user-selectable component splits. Either
+         the whole stack ships or nothing does (Service + App + bypass
+         data are coupled; missing any one breaks the rest).
+         ============================================================ -->
+    <Feature Id="VertexFeature"
+             Title="!(loc.FeatureTitle)"
+             Description="!(loc.FeatureDescription)"
+             Level="1"
+             AllowAbsent="no">
+      <ComponentGroupRef Id="VertexServiceGroup" />
+      <ComponentGroupRef Id="VertexAppGroup" />
+      <ComponentGroupRef Id="VertexAppShortcutGroup" />
+      <ComponentGroupRef Id="VertexDataGroup" />
+    </Feature>
+
+  </Package>
+</Wix>

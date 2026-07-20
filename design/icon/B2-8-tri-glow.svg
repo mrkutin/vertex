@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- B2-8: All three nodes glow — vertex stronger, endpoints subtle. -->
+  <defs>
+    <radialGradient id="bg8" cx="50%" cy="55%" r="70%">
+      <stop offset="0%" stop-color="#162456"/>
+      <stop offset="100%" stop-color="#080F26"/>
+    </radialGradient>
+    <radialGradient id="vGlow8" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.6"/>
+      <stop offset="40%" stop-color="#7DB3FF" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#7DB3FF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="eGlow8" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.45"/>
+      <stop offset="50%" stop-color="#7DB3FF" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#7DB3FF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg8)"/>
+  <!-- Endpoint glows -->
+  <circle cx="280" cy="304" r="140" fill="url(#eGlow8)"/>
+  <circle cx="744" cy="304" r="140" fill="url(#eGlow8)"/>
+  <!-- Vertex glow (largest) -->
+  <circle cx="512" cy="720" r="240" fill="url(#vGlow8)"/>
+  <!-- Extended V structure -->
+  <line x1="241" y1="234" x2="512" y2="720" stroke="#FFFFFF" stroke-width="56" stroke-linecap="round"/>
+  <line x1="783" y1="234" x2="512" y2="720" stroke="#FFFFFF" stroke-width="56" stroke-linecap="round"/>
+  <circle cx="280" cy="304" r="48" fill="#FFFFFF"/>
+  <circle cx="744" cy="304" r="48" fill="#FFFFFF"/>
+  <circle cx="512" cy="720" r="72" fill="#FFFFFF"/>
+</svg>

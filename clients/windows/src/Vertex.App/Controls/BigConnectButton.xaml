@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="Vertex.App.Controls.BigConnectButton"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        Capsule = Border with CornerRadius = MinHeight / 2.  WinUI
+        ignores oversize CornerRadius (≥999) in some contexts and
+        flattens it into an ellipse, so we pin to half the height.
+    -->
+    <Border x:Name="Capsule"
+            HorizontalAlignment="Stretch"
+            MinHeight="56"
+            CornerRadius="28"
+            Background="{StaticResource AccentPrimaryBrush}"
+            Tapped="OnTapped"
+            PointerEntered="OnPointerEntered"
+            PointerExited="OnPointerExited"
+            PointerPressed="OnPointerPressed"
+            PointerReleased="OnPointerReleased">
+        <Border.RenderTransform>
+            <ScaleTransform x:Name="PressScale" ScaleX="1" ScaleY="1" CenterX="0" CenterY="0"/>
+        </Border.RenderTransform>
+        <StackPanel Orientation="Horizontal" Spacing="10"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+            <ProgressRing x:Name="Spinner"
+                          Width="18" Height="18"
+                          IsIndeterminate="True"
+                          Foreground="{StaticResource AccentPrimaryBrush}"
+                          Visibility="Collapsed"/>
+            <TextBlock x:Name="Label"
+                       Text="Connect"
+                       FontFamily="Segoe UI Variable Display"
+                       FontSize="18"
+                       FontWeight="SemiBold"
+                       Foreground="#FF080F26"/>
+        </StackPanel>
+    </Border>
+</UserControl>

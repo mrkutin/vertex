@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Vertex brand palette (dark only — parity with iOS preferredColorScheme(.dark)).
+         These are the raw hex values consumed by Compose Tokens in ui/theme/Tokens.kt;
+         duplicated here for any AndroidX views or system surfaces (window background,
+         splash screen) that need a static color resource.
+
+         Values match clients/ios/Vertex/App/Assets.xcassets *.colorset (dark) byte-for-byte. -->
+    <color name="bgCanvas">#FF080F26</color>
+    <color name="bgCanvasTop">#FF162456</color>
+    <color name="bgCanvasBottom">#FF080F26</color>
+    <color name="bgSurface">#FF101A3D</color>
+    <color name="bgSurfaceElev">#FF162456</color>
+    <color name="bgSurfaceMuted">#FF0C1430</color>
+
+    <color name="borderSubtle">#14FFFFFF</color>
+    <color name="borderStrong">#477DB3FF</color>
+
+    <color name="accentPrimary">#FF7DB3FF</color>
+    <color name="accentPrimaryHover">#FF9CC6FF</color>
+    <color name="accentPrimaryMuted">#2E7DB3FF</color>
+
+    <color name="glowPrimary">#997DB3FF</color>
+    <color name="glowCoreHot">#99FFFFFF</color>
+    <color name="glowWarm">#8CFAF4E6</color>
+
+    <color name="textPrimary">#FFFFFFFF</color>
+    <color name="textSecondary">#C7C4D2EE</color>
+    <color name="textTertiary">#998497C2</color>
+    <color name="textOnAccent">#FF0B1638</color>
+
+    <color name="glyphPrimary">#FFFFFFFF</color>
+    <color name="glyphDim">#80C4D2EE</color>
+
+    <color name="stateConnected">#FF7DB3FF</color>
+    <color name="stateConnectedGlow">#BFFFFFFF</color>
+    <color name="stateTransitioning">#FFFAD27A</color>
+    <color name="stateTransitioningGlow">#80FAD27A</color>
+    <color name="stateDormant">#FF8497C2</color>
+    <color name="stateError">#FFFF6E78</color>
+    <color name="stateErrorGlow">#80FF6E78</color>
+</resources>

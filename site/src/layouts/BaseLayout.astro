@@ -1,0 +1,101 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { getLangFromUrl, alternatePath } from '../i18n/utils';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description = 'Vertex — where paths meet. A modern VPN built around a relay-vertex topology.',
+  ogImage = '/og-image.png',
+  noindex = false,
+} = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const altLang = lang === 'en' ? 'ru' : 'en';
+const siteBase = Astro.site ?? Astro.url.origin;
+const altUrl = new URL(alternatePath(Astro.url, altLang), siteBase).toString();
+const xDefaultUrl = new URL(alternatePath(Astro.url, 'en'), siteBase).toString();
+const canonical = new URL(Astro.url.pathname, siteBase).toString();
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="generator" content={Astro.generator} />
+
+    {/* Theme bootstrap — runs before stylesheet to avoid FOUC. Always sets
+        data-theme to a concrete value, with dark as the safe fallback. */}
+    <script is:inline>
+      (function () {
+        // Dark by default — user can opt into light via the toggle, then it persists.
+        var theme = 'dark';
+        try {
+          var stored = localStorage.getItem('vertex-theme');
+          if (stored === 'light' || stored === 'dark') theme = stored;
+        } catch (_e) {}
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang={altLang} href={altUrl} />
+    <link rel="alternate" hreflang="x-default" href={xDefaultUrl} />
+
+    {/* Favicons + Apple touch */}
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180.png" />
+    <link rel="mask-icon" href="/icons/mask.svg" color="#7DB3FF" />
+
+    {/* Self-hosted fonts: preload only the variable axes we render above the fold. */}
+    <link
+      rel="preload"
+      href="/fonts/Inter-Variable.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+
+    <meta name="theme-color" content="#080F26" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#F4F6FB" media="(prefers-color-scheme: light)" />
+
+    {/* OpenGraph / Twitter */}
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(ogImage, Astro.site ?? Astro.url.origin).toString()} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={lang === 'ru' ? 'ru_RU' : 'en_US'} />
+    <meta property="og:locale:alternate" content={altLang === 'ru' ? 'ru_RU' : 'en_US'} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+  </head>
+  <body class="vx-canvas-gradient">
+    <Header />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
+
+<style is:global>
+  main {
+    min-height: 60vh;
+  }
+</style>

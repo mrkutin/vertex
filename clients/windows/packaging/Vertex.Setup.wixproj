@@ -1,0 +1,135 @@
+<Project Sdk="WixToolset.Sdk/6.0.2">
+  <PropertyGroup>
+    <!-- Per-platform property mappings come FIRST so values referenced
+         by OutputName / DefineConstants below are already evaluated.
+         MSBuild assigns properties in file order; references resolve
+         lazily but only against properties already assigned at the
+         point the reference is evaluated. -->
+
+    <!-- WiX 4/5/6 InstallerPlatform => MSI Template Summary stream.
+         x64 MSI only installs on x64; arm64 only on arm64. The
+         platforms are inherited from Directory.Build.props (x64;ARM64). -->
+    <InstallerPlatform Condition="'$(Platform)'=='ARM64'">arm64</InstallerPlatform>
+    <InstallerPlatform Condition="'$(Platform)'=='x64'">x64</InstallerPlatform>
+
+    <!-- Map Platform → win-RID for the publish output path. -->
+    <VertexRid Condition="'$(Platform)'=='ARM64'">win-arm64</VertexRid>
+    <VertexRid Condition="'$(Platform)'=='x64'">win-x64</VertexRid>
+    <VertexTfm>net8.0-windows10.0.19041.0</VertexTfm>
+
+    <!-- Wintun DLL filename per platform. amd64 binary is named "amd64",
+         not "x64", in the upstream zip. -->
+    <_VertexWintunArch Condition="'$(Platform)'=='ARM64'">arm64</_VertexWintunArch>
+    <_VertexWintunArch Condition="'$(Platform)'=='x64'">amd64</_VertexWintunArch>
+
+    <!-- Display arch for OutputName + dist filename. Lowercased. -->
+    <_VertexDistArch Condition="'$(Platform)'=='ARM64'">arm64</_VertexDistArch>
+    <_VertexDistArch Condition="'$(Platform)'=='x64'">x64</_VertexDistArch>
+
+    <!-- Repo-wide release tree. clients/windows/packaging/ → dist/windows/
+         is three levels up (../../../dist/windows/). -->
+    <_VertexDistDir>$(MSBuildThisFileDirectory)..\..\..\dist\windows</_VertexDistDir>
+
+    <!-- Output: Vertex-windows-v{VersionPrefix}-{x64|arm64}.msi alongside
+         the project's bin/ folder. The CopyToDist target below also
+         publishes a copy to ../../dist/windows/ so all-platform release
+         artefacts (dist/macos, dist/ios, dist/android, dist/cli, ...)
+         live under one tree. -->
+    <OutputName>Vertex-windows-v$(VersionPrefix)-$(_VertexDistArch)</OutputName>
+    <OutputType>Package</OutputType>
+
+    <!-- UpgradeCode lives in Product.wxs (single source of truth) — see
+         the <?if VertexPlatform?> block. Never reuse across architectures
+         (Windows treats x64 and ARM64 MSIs as unrelated installers). -->
+
+    <!-- Preprocessor variables consumed by Product.wxs. The publish dirs
+         must be populated by `make.ps1 publish-amd64` / `publish-arm64`
+         BEFORE this project builds — they put self-contained output in
+         publish/<rid>/{Service,App}/, the same paths consumed here. -->
+    <DefineConstants>
+      VertexPlatform=$(Platform);
+      WintunDll=$(MSBuildThisFileDirectory)Files\wintun-$(_VertexWintunArch).dll;
+      ServiceExeDir=$(MSBuildThisFileDirectory)..\publish\$(VertexRid)\Service;
+      AppExeDir=$(MSBuildThisFileDirectory)..\publish\$(VertexRid)\App;
+      RuNetsZone=$(MSBuildThisFileDirectory)..\src\Vertex.App\Resources\ru-aggregated.zone;
+      LicenseTxt=$(MSBuildThisFileDirectory)Files\LICENSE.txt
+    </DefineConstants>
+
+    <!-- ICE61: AllowSameVersionUpgrades trips this benign validation —
+         WiX upstream recommends suppressing.
+         ICE03: WinAppSDK self-contained ships some native DLLs with
+         language-neutral metadata that ICE03 flags. Benign — runtime
+         loader picks the right resources regardless. -->
+    <SuppressIces>ICE61;ICE03</SuppressIces>
+
+    <!-- Where to look for files referenced by relative paths in .wxs -->
+    <DefaultCompressionLevel>high</DefaultCompressionLevel>
+
+    <!-- Override Directory.Build.props default ('portable'). WiX accepts
+         only 'full' or 'none'; MSI doesn't carry .NET PDBs anyway. -->
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+
+    <!-- Directory.Build.props turns warnings into errors; WiX harvest
+         emits WIX8602 ("file already harvested") whenever a Files glob
+         scans the same set twice — known WiX 6 SDK quirk on UNC source
+         paths (\\Mac\... shared folder). Suppress entirely. -->
+    <NoWarn>$(NoWarn);WIX8602</NoWarn>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Util.wixext" Version="6.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Compile Include is auto-derived by the WiX SDK from any *.wxs in
+         the project folder (don't list explicitly — listing it twice
+         was producing WIX0089 "multiple entry sections"). -->
+    <!-- Same for *.wxl: WiX SDK picks up localization automatically; the
+         active culture is driven by the Cultures property. -->
+  </ItemGroup>
+
+  <PropertyGroup>
+    <Cultures>en-US</Cultures>
+  </PropertyGroup>
+
+  <!-- Authenticode signing of the MSI. Runs only when VertexCertPfx is
+       set (CI / release builds). Service.exe and App.exe should already
+       be signed by tools/make.ps1 BEFORE this project builds, so they
+       carry their own Authenticode signature once embedded in the MSI.
+
+       Inputs/Outputs make the target incremental: a stamp file next to
+       the MSI is touched on success; a no-op rebuild that didn't
+       regenerate the MSI skips signing (saves a network round-trip to
+       the RFC 3161 timestamp server). -->
+  <Target Name="SignMsi"
+          AfterTargets="Build"
+          Inputs="$(TargetPath)"
+          Outputs="$(TargetPath).signed.stamp"
+          Condition="'$(VertexCertPfx)' != '' And Exists('$(VertexCertPfx)')">
+    <PropertyGroup>
+      <_VertexTimestamp Condition="'$(VertexTimestamper)' == ''">http://timestamp.digicert.com</_VertexTimestamp>
+      <_VertexTimestamp Condition="'$(VertexTimestamper)' != ''">$(VertexTimestamper)</_VertexTimestamp>
+    </PropertyGroup>
+    <Exec Command="signtool sign /fd SHA256 /tr $(_VertexTimestamp) /td SHA256 /f &quot;$(VertexCertPfx)&quot; /p &quot;$(VertexCertPwd)&quot; /d &quot;Vertex VPN Installer&quot; /du &quot;https://vertices.ru&quot; &quot;$(TargetPath)&quot;" />
+    <Touch Files="$(TargetPath).signed.stamp" AlwaysCreate="true" />
+  </Target>
+
+  <!-- Publish the MSI to ../../dist/windows/ so all-platform release
+       artefacts share one tree (dist/macos/Vertex-macos-v*.app.zip,
+       dist/ios/Vertex-ios-v*.app.zip, dist/android/Vertex-android-v*.apk,
+       dist/cli/<rid>/vtx-client, ...). Runs after SignMsi so the dist
+       copy carries Authenticode (when configured). Idempotent via
+       Inputs/Outputs. -->
+  <Target Name="CopyToDist"
+          AfterTargets="SignMsi;Build"
+          Inputs="$(TargetPath)"
+          Outputs="$(_VertexDistDir)\$(OutputName).msi">
+    <MakeDir Directories="$(_VertexDistDir)" />
+    <Copy SourceFiles="$(TargetPath)"
+          DestinationFiles="$(_VertexDistDir)\$(OutputName).msi"
+          SkipUnchangedFiles="true" />
+    <Message Text="Copied MSI to $(_VertexDistDir)\$(OutputName).msi" Importance="high" />
+  </Target>
+</Project>

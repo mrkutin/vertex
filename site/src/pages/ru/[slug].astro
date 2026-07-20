@@ -1,0 +1,55 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import DocLayout from '../../layouts/DocLayout.astro';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+export async function getStaticPaths() {
+  const all = await getCollection('pages', ({ id }) => id.endsWith('/ru.mdx'));
+  return all.map((entry) => {
+    const slug = entry.id.split('/')[0]!;
+    return {
+      params: { slug },
+      props: { entryId: entry.id, slug },
+    };
+  });
+}
+
+interface Props {
+  entryId: string;
+  slug: string;
+}
+
+const { entryId } = Astro.props;
+const entry = await getEntry('pages', entryId.replace(/\.mdx$/, ''));
+if (!entry) {
+  throw new Error(`Missing content entry: ${entryId}`);
+}
+const { Content, headings } = await entry.render();
+
+const toc = headings
+  .filter((h) => h.depth === 2 || h.depth === 3)
+  .map((h) => ({ depth: h.depth, slug: h.slug, text: h.text }));
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<DocLayout title={entry.data.title} description={entry.data.description} toc={toc}>
+  {entry.data.lastUpdated && (
+    <p class="vx-doc-meta">
+      {t('doc.lastUpdated')}: <time datetime={entry.data.lastUpdated}>{entry.data.lastUpdated}</time>
+    </p>
+  )}
+  <div class="vx-prose">
+    <Content />
+  </div>
+</DocLayout>
+
+<style>
+  .vx-doc-meta {
+    color: var(--vx-text-tertiary);
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.82rem;
+    margin-bottom: 1.5rem;
+  }
+</style>

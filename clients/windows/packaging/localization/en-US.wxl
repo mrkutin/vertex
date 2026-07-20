@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="en-US"
+                 xmlns="http://wixtoolset.org/schemas/v4/wxl">
+
+  <String Id="ProductName"             Value="Vertex VPN" />
+  <String Id="Manufacturer"             Value="Vertex" />
+
+  <String Id="PackageDescription"       Value="Vertex VPN — where paths meet." />
+
+  <String Id="ServiceDisplayName"       Value="Vertex VPN" />
+  <String Id="ServiceDescription"       Value="Manages the Vertex VPN tunnel: routes traffic through a trusted vertex, owns the device identity key, and acts on commands from the Vertex desktop app." />
+
+  <String Id="AppShortcutDescription"   Value="Vertex VPN — where paths meet" />
+
+  <String Id="FeatureTitle"             Value="Vertex VPN" />
+  <String Id="FeatureDescription"       Value="Service, desktop app, and bundled WinTUN driver." />
+
+  <String Id="DowngradeError"           Value="A newer version of Vertex VPN is already installed. Uninstall it first if you really want to downgrade." />
+  <String Id="MinWinError"              Value="Vertex VPN requires 64-bit Windows 10 version 1903 (build 18362) or newer." />
+
+</WixLocalization>

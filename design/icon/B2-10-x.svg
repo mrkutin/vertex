@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- B2-10: Lines extend past ALL three dots equally (32px visible past each dot edge). -->
+  <!-- Tri-glow color scheme from B2-8 (dark blue radial + glow at all 3 nodes). -->
+  <!-- Geometry: line passes through (extension_top, endpoint_dot, vertex_dot, extension_bottom). -->
+  <!-- Top dot r=48, vertex dot r=72. Top extension 80px from endpoint center → 32px visible past dot. -->
+  <!-- Bottom extension 104px from vertex center → 32px visible past dot. -->
+  <!-- Unit vector along line 1 (top-left → vertex): (0.4871, 0.8734). -->
+  <!-- Top-left ext: (280 - 80*0.4871, 304 - 80*0.8734) = (241, 234). -->
+  <!-- Bottom-right ext (line 1 past vertex): (512 + 104*0.4871, 720 + 104*0.8734) = (563, 811). -->
+  <!-- Bottom-left ext (line 2 past vertex): (461, 811). Top-right ext: (783, 234). -->
+  <defs>
+    <radialGradient id="bg10" cx="50%" cy="55%" r="70%">
+      <stop offset="0%" stop-color="#162456"/>
+      <stop offset="100%" stop-color="#080F26"/>
+    </radialGradient>
+    <radialGradient id="vGlow10" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.6"/>
+      <stop offset="40%" stop-color="#7DB3FF" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#7DB3FF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="eGlow10" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.45"/>
+      <stop offset="50%" stop-color="#7DB3FF" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#7DB3FF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg10)"/>
+  <!-- Glows: small at endpoints, larger at vertex -->
+  <circle cx="280" cy="304" r="140" fill="url(#eGlow10)"/>
+  <circle cx="744" cy="304" r="140" fill="url(#eGlow10)"/>
+  <circle cx="512" cy="720" r="240" fill="url(#vGlow10)"/>
+  <!-- Lines extending past all three dots (full X-shape) -->
+  <line x1="241" y1="234" x2="563" y2="811" stroke="#FFFFFF" stroke-width="56" stroke-linecap="round"/>
+  <line x1="783" y1="234" x2="461" y2="811" stroke="#FFFFFF" stroke-width="56" stroke-linecap="round"/>
+  <!-- Dots -->
+  <circle cx="280" cy="304" r="48" fill="#FFFFFF"/>
+  <circle cx="744" cy="304" r="48" fill="#FFFFFF"/>
+  <circle cx="512" cy="720" r="72" fill="#FFFFFF"/>
+</svg>

@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Same Windows TFM as Vertex.Service so the project reference
+         is compatible. ITunDevice / PacketPipeline are platform-neutral
+         in their managed surface, but the assembly targets the Windows
+         TFM (P/Invoke into wintun.dll). -->
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.18362.0</SupportedOSPlatformVersion>
+    <RootNamespace>Vertex.Service.Tests</RootNamespace>
+    <AssemblyName>Vertex.Service.Tests</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.*" />
+    <PackageReference Include="xunit" Version="2.*" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.*" />
+    <PackageReference Include="FluentAssertions" Version="6.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vertex.Service\Vertex.Service.csproj" />
+    <ProjectReference Include="..\Vertex.Core\Vertex.Core.csproj" />
+    <ProjectReference Include="..\Vertex.Shared\Vertex.Shared.csproj" />
+    <!-- NOT referencing Vertex.App: WinUI Exe pulls MRT Core / PRIGen
+         targets that don't load inside dotnet test. Phase 1.11 covers
+         App-side IPC end-to-end via manual VM smoke. -->
+  </ItemGroup>
+
+  <!-- Same libsodium-on-testhost dance as Vertex.Core.Tests: copy the
+       win-x64 native dll flat into the test bin so NSec works inside
+       the x64-emulated testhost on Windows ARM64. -->
+  <Target Name="CopyLibsodiumNextToTestHost" AfterTargets="Build">
+    <ItemGroup>
+      <_VxLibsodium Include="$(OutDir)runtimes\win-x64\native\libsodium.dll" />
+    </ItemGroup>
+    <Copy
+      SourceFiles="@(_VxLibsodium)"
+      DestinationFolder="$(OutDir)"
+      SkipUnchangedFiles="true"
+      Condition="'@(_VxLibsodium)' != ''" />
+  </Target>
+
+</Project>

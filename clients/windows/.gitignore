@@ -1,0 +1,40 @@
+## .NET / VS
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.binlog
+
+## Tests
+TestResults/
+coverage.cobertura.xml
+*.trx
+
+## Publish output
+publish/
+artifacts/
+
+## Generated
+Generated Files/
+*.cache
+*.tlog
+
+## WiX
+*.wixobj
+*.wixpdb
+*.msi
+*.msm
+*.msp
+*.signed.stamp
+packaging/Files/wintun-*.dll
+packaging/Files/LICENSE.txt
+
+## Signing artifacts
+*.pfx
+*.snk
+*.cer
+
+## Native pdb
+*.pdb
+*.ilk

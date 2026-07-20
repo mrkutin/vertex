@@ -1,0 +1,30 @@
+# Ethernet+DHCP WAN variant for Vertex R3S-inline.
+# Activated by vtx-inline-wan-up.sh when /etc/vertex-inline/inline.env has
+# VTX_WAN_MODE=dhcp. The script copies this to /etc/systemd/network/10-vtx-wan.network
+# and runs `networkctl reload`.
+
+[Match]
+Name=eth0
+
+[Network]
+DHCP=ipv4
+LinkLocalAddressing=no
+
+[DHCP]
+# Use MAC address as DHCP client-identifier (not the DUID, which is networkd's
+# default). Production R3S and most netplan/dhclient setups identify clients
+# by MAC — static leases bound to MAC on the ISP/router won't match if we
+# silently switch to DUID-based ID after the install.sh netplan → networkd
+# migration. Found 2026-05-19 on R3S-inline live test: Mikrotik gave fresh
+# .17 instead of MAC-bound static .13.
+ClientIdentifier=mac
+
+# Full DHCP-option neutrality — R3S is DNS/NTP/hostname-neutral.
+UseDNS=no
+UseDomains=no
+UseNTP=no
+UseHostname=no
+SendHostname=no
+# Pull default route from ISP.
+UseRoutes=yes
+RouteMetric=100

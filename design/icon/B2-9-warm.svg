@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- B2-9: Same hybrid composition with warm gold glow on deep plum. -->
+  <defs>
+    <radialGradient id="bg9" cx="50%" cy="70%" r="65%">
+      <stop offset="0%" stop-color="#2A1734"/>
+      <stop offset="100%" stop-color="#0E0613"/>
+    </radialGradient>
+    <radialGradient id="glow9" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFF5D4" stop-opacity="0.6"/>
+      <stop offset="40%" stop-color="#E8B85B" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#E8B85B" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg9)"/>
+  <!-- Warm vertex glow -->
+  <circle cx="512" cy="720" r="240" fill="url(#glow9)"/>
+  <!-- Extended V structure (warm white instead of pure white) -->
+  <line x1="241" y1="234" x2="512" y2="720" stroke="#FAF4E6" stroke-width="56" stroke-linecap="round"/>
+  <line x1="783" y1="234" x2="512" y2="720" stroke="#FAF4E6" stroke-width="56" stroke-linecap="round"/>
+  <circle cx="280" cy="304" r="48" fill="#FAF4E6"/>
+  <circle cx="744" cy="304" r="48" fill="#FAF4E6"/>
+  <!-- Vertex with subtle gold tint -->
+  <circle cx="512" cy="720" r="72" fill="#FFE8A8"/>
+</svg>

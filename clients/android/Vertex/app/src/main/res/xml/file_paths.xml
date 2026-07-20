@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  FileProvider paths for Diagnostics zip exports. Only `cache/diagnostics/`
+  is exposed (where `DiagnosticsRepository.exportZip` writes its bundle); the
+  rest of the app's storage stays private.
+-->
+<paths>
+    <cache-path
+        name="diagnostics"
+        path="diagnostics/" />
+</paths>

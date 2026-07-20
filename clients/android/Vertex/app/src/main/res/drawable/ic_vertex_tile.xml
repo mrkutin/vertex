@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Quick Settings Tile glyph: simplified V-asterisk on a 24dp viewport.
+     Single-colour so Android can tint it active/inactive via the system
+     palette. Geometry derived from clients/ios/Vertex/App/Views/Components/Glyphs/VxAsteriskGlyph.swift
+     (24-pt viewport centred at 12,12), strokes thinned so the shape stays
+     legible at 18dp on the tile bitmap.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="?android:attr/colorControlNormal">
+
+    <!-- Diagonal A: (6,8) → (12,16) -->
+    <path
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M6,8 L12,16" />
+    <!-- Diagonal B: (18,8) → (12,16) -->
+    <path
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M18,8 L12,16" />
+
+    <!-- Endpoint A dot (6,8) r=2 -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M6,8 m-2,0 a2,2 0 1,1 4,0 a2,2 0 1,1 -4,0" />
+    <!-- Endpoint B dot (18,8) r=2 -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M18,8 m-2,0 a2,2 0 1,1 4,0 a2,2 0 1,1 -4,0" />
+    <!-- Vertex dot (12,16) r=2.5 -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M12,16 m-2.5,0 a2.5,2.5 0 1,1 5,0 a2.5,2.5 0 1,1 -5,0" />
+</vector>

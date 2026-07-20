@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- V-asterisk launcher glyph. Geometry mirrors clients/ios/Vertex/App/Views/Components/Glyphs/VxAsteriskGlyph.swift
+     scaled into the 108×108 adaptive-icon canvas with safe-zone padding (66 dp safe area, ~21 dp inset).
+     Source 24-pt viewport (centred at 12,12) is scaled ×2.5 and translated by (+24,+24) so the
+     V-asterisk lives inside the safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Line A: (6,8) → (16.5,22) in 24-pt space ⇒ (39,44) → (65.25,79) -->
+    <path
+        android:strokeColor="@color/accentPrimary"
+        android:strokeWidth="5"
+        android:strokeLineCap="round"
+        android:pathData="M39,44 L65.25,79" />
+    <!-- Line B: (18,8) → (7.5,22) in 24-pt space ⇒ (69,44) → (42.75,79) -->
+    <path
+        android:strokeColor="@color/accentPrimary"
+        android:strokeWidth="5"
+        android:strokeLineCap="round"
+        android:pathData="M69,44 L42.75,79" />
+
+    <!-- Endpoint A dot (39,44) r=4 -->
+    <path
+        android:fillColor="@color/accentPrimary"
+        android:pathData="M39,44 m-4,0 a4,4 0 1,1 8,0 a4,4 0 1,1 -8,0" />
+    <!-- Endpoint B dot (69,44) r=4 -->
+    <path
+        android:fillColor="@color/accentPrimary"
+        android:pathData="M69,44 m-4,0 a4,4 0 1,1 8,0 a4,4 0 1,1 -8,0" />
+    <!-- Vertex dot (54,64) r=5 — drawn last so the lines visually pass under it -->
+    <path
+        android:fillColor="@color/accentPrimary"
+        android:pathData="M54,64 m-5,0 a5,5 0 1,1 10,0 a5,5 0 1,1 -10,0" />
+</vector>

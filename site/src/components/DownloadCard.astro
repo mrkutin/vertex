@@ -1,0 +1,102 @@
+---
+import Icon, { type IconName } from './Icon.astro';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+interface Props {
+  id: string;
+  icon: IconName;
+  platform: string;
+  note: string;
+  state?: 'available' | 'soon' | 'external';
+}
+
+const { id, icon, platform, note, state = 'available' } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<article id={id} class="vx-dl-card" data-state={state}>
+  <header class="vx-dl-head">
+    <div class="vx-dl-icon" aria-hidden="true">
+      <Icon name={icon} size={32} strokeWidth={1.5} />
+    </div>
+    <div>
+      <h2>{platform}</h2>
+      {state === 'soon' && <p class="vx-dl-pill">{t('download.comingSoon')}</p>}
+    </div>
+  </header>
+  <p class="vx-dl-note">{note}</p>
+  <div class="vx-dl-actions">
+    <slot name="actions" />
+  </div>
+  <slot name="extra" />
+</article>
+
+<style>
+  .vx-dl-card {
+    border-radius: var(--vx-radius);
+    padding: 1.5rem;
+    background: var(--vx-bg-surface-elev);
+    border: 1px solid var(--vx-border-subtle);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    scroll-margin-top: 96px;
+    transition: border-color 200ms ease, background 200ms ease;
+  }
+  .vx-dl-card[data-state='soon'] {
+    opacity: 0.85;
+  }
+  .vx-dl-card:hover {
+    border-color: var(--vx-border-strong);
+  }
+  .vx-dl-card[data-current='true'] {
+    border-color: var(--vx-accent);
+    box-shadow: 0 0 0 1px var(--vx-accent-soft);
+  }
+
+  .vx-dl-head {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .vx-dl-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: var(--vx-accent-soft);
+    color: var(--vx-accent);
+    flex-shrink: 0;
+  }
+  .vx-dl-head h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+  .vx-dl-pill {
+    margin-top: 0.25rem;
+    display: inline-block;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.18em 0.55em;
+    border-radius: 999px;
+    background: var(--vx-bg-surface-muted);
+    color: var(--vx-text-tertiary);
+    border: 1px solid var(--vx-border-subtle);
+  }
+
+  .vx-dl-note {
+    color: var(--vx-text-secondary);
+    line-height: 1.55;
+    flex-grow: 1;
+  }
+  .vx-dl-actions {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+</style>

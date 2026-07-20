@@ -1,0 +1,77 @@
+---
+/**
+ * Static architecture diagram: client → vertex → exit, with
+ * "encrypted" labels above each link. Inline SVG, decorative.
+ */
+interface Props {
+  clientLabel: string;
+  vertexLabel: string;
+  exitLabel: string;
+  encryptedLabel: string;
+}
+const { clientLabel, vertexLabel, exitLabel, encryptedLabel } = Astro.props;
+---
+
+<figure class="vx-arch" aria-hidden="false">
+  <svg viewBox="0 0 800 220" role="img" aria-label="Vertex topology" class="vx-arch-svg">
+    <defs>
+      <radialGradient id="vx-arch-vertex" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#FFFFFF" stop-opacity="1" />
+        <stop offset="60%" stop-color="var(--vx-accent)" stop-opacity="0.85" />
+        <stop offset="100%" stop-color="var(--vx-accent)" stop-opacity="0" />
+      </radialGradient>
+    </defs>
+
+    {/* Edge: client → vertex */}
+    <line x1="120" y1="120" x2="370" y2="120" stroke="var(--vx-border-strong)" stroke-width="1.5" stroke-linecap="round" />
+    {/* Edge: vertex → exit */}
+    <line x1="430" y1="120" x2="680" y2="120" stroke="var(--vx-border-strong)" stroke-width="1.5" stroke-linecap="round" />
+
+    {/* "encrypted" labels */}
+    <text x="245" y="100" text-anchor="middle" class="vx-arch-tag">{encryptedLabel}</text>
+    <text x="555" y="100" text-anchor="middle" class="vx-arch-tag">{encryptedLabel}</text>
+
+    {/* Client node */}
+    <circle cx="120" cy="120" r="22" fill="var(--vx-bg-surface)" stroke="var(--vx-border-strong)" stroke-width="1.5" />
+    <text x="120" y="170" text-anchor="middle" class="vx-arch-label">{clientLabel}</text>
+
+    {/* Vertex node (central, glowing) */}
+    <circle cx="400" cy="120" r="60" fill="url(#vx-arch-vertex)" opacity="0.55" />
+    <circle cx="400" cy="120" r="28" fill="#FFFFFF" />
+    <text x="400" y="170" text-anchor="middle" class="vx-arch-label vx-arch-label-strong">{vertexLabel}</text>
+
+    {/* Exit node */}
+    <circle cx="680" cy="120" r="22" fill="var(--vx-bg-surface)" stroke="var(--vx-border-strong)" stroke-width="1.5" />
+    <text x="680" y="170" text-anchor="middle" class="vx-arch-label">{exitLabel}</text>
+  </svg>
+</figure>
+
+<style>
+  .vx-arch {
+    width: 100%;
+    max-width: 820px;
+    margin: 0 auto;
+  }
+  .vx-arch-svg {
+    width: 100%;
+    height: auto;
+  }
+  .vx-arch-tag {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    fill: var(--vx-accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .vx-arch-label {
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 13px;
+    fill: var(--vx-text-secondary);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .vx-arch-label-strong {
+    fill: var(--vx-text-primary);
+  }
+</style>

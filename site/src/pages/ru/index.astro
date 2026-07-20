@@ -1,0 +1,337 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import HeroGraph from '../../components/HeroGraph.astro';
+import NumbersStrip from '../../components/NumbersStrip.astro';
+import FeatureCard from '../../components/FeatureCard.astro';
+import ArchDiagram from '../../components/ArchDiagram.astro';
+import Button from '../../components/Button.astro';
+import Icon from '../../components/Icon.astro';
+import { getLangFromUrl, useTranslations, useTranslatedPath } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const path = useTranslatedPath(lang);
+
+const features = [
+  { icon: 'lock' as const, title: t('home.features.e2e.title'), desc: t('home.features.e2e.desc') },
+  { icon: 'network' as const, title: t('home.features.vertex.title'), desc: t('home.features.vertex.desc') },
+  { icon: 'zap' as const, title: t('home.features.exit.title'), desc: t('home.features.exit.desc') },
+  { icon: 'shield' as const, title: t('home.features.identity.title'), desc: t('home.features.identity.desc') },
+  { icon: 'git-branch' as const, title: t('home.features.split.title'), desc: t('home.features.split.desc') },
+  { icon: 'globe' as const, title: t('home.features.dpi.title'), desc: t('home.features.dpi.desc') },
+];
+
+const platforms = [
+  { name: 'iOS', icon: 'apple' as const, anchor: 'ios' },
+  { name: 'macOS', icon: 'monitor' as const, anchor: 'macos' },
+  { name: 'Android', icon: 'smartphone' as const, anchor: 'android' },
+  { name: 'Linux', icon: 'terminal' as const, anchor: 'linux' },
+  { name: 'Windows', icon: 'monitor' as const, anchor: 'windows' },
+  { name: 'Gateway', icon: 'router' as const, anchor: 'gateway' },
+];
+
+const encryptedLabel = 'зашифровано';
+const archClient = 'клиент';
+const archVertex = 'вершина';
+const archExit = 'выходной узел';
+---
+
+<BaseLayout
+  title="Vertex — Точка схождения"
+  description="Vertex — современный VPN, построенный вокруг сети независимых вершин. Приложения для iOS, macOS, Android и Windows."
+>
+  <section class="vx-hero vx-container">
+    <div class="vx-hero-text">
+      <p class="vx-hero-eyebrow vx-wordmark">VERTEX</p>
+      <h1 class="vx-hero-title">{t('hero.heading')}</h1>
+      <p class="vx-hero-tag">{t('hero.tagline')}</p>
+      <p class="vx-hero-sub">{t('hero.subtag')}</p>
+      <div class="vx-hero-actions">
+        <Button href={path('/download')} variant="primary" size="lg" iconAfter="arrow-right">
+          {t('cta.download')}
+        </Button>
+        <Button href={path('/features')} variant="ghost" size="lg">
+          {t('cta.learnMore')}
+        </Button>
+      </div>
+    </div>
+    <div class="vx-hero-graph-wrap">
+      <HeroGraph />
+    </div>
+  </section>
+
+  <NumbersStrip />
+
+  <section class="vx-section vx-container" aria-labelledby="vx-features-h">
+    <header class="vx-section-head">
+      <h2 id="vx-features-h">{t('home.features.heading')}</h2>
+      <p>{t('home.features.lede')}</p>
+    </header>
+    <ul role="list" class="vx-feat-grid">
+      {features.map((f) => (
+        <li>
+          <FeatureCard icon={f.icon} title={f.title} desc={f.desc} />
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="vx-section vx-container" aria-labelledby="vx-arch-h">
+    <header class="vx-section-head">
+      <h2 id="vx-arch-h">{t('home.arch.heading')}</h2>
+      <p>{t('home.arch.lede')}</p>
+    </header>
+    <ArchDiagram
+      clientLabel={archClient}
+      vertexLabel={archVertex}
+      exitLabel={archExit}
+      encryptedLabel={encryptedLabel}
+    />
+  </section>
+
+  <section class="vx-section vx-container" aria-labelledby="vx-how-h">
+    <header class="vx-section-head">
+      <h2 id="vx-how-h">{t('home.how.heading')}</h2>
+    </header>
+    <ol role="list" class="vx-how-grid">
+      <li class="vx-how-step">
+        <span class="vx-how-num">01</span>
+        <h3>{t('home.how.step1.title')}</h3>
+        <p>{t('home.how.step1.desc')}</p>
+      </li>
+      <li class="vx-how-step">
+        <span class="vx-how-num">02</span>
+        <h3>{t('home.how.step2.title')}</h3>
+        <p>{t('home.how.step2.desc')}</p>
+      </li>
+      <li class="vx-how-step">
+        <span class="vx-how-num">03</span>
+        <h3>{t('home.how.step3.title')}</h3>
+        <p>{t('home.how.step3.desc')}</p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="vx-section vx-container" aria-labelledby="vx-dl-h">
+    <header class="vx-section-head">
+      <h2 id="vx-dl-h">{t('home.download.heading')}</h2>
+      <p>{t('home.download.lede')}</p>
+    </header>
+    <ul role="list" class="vx-platform-grid">
+      {platforms.map((p) => (
+        <li>
+          <a class="vx-platform-tile" href={`${path('/download')}#${p.anchor}`}>
+            <Icon name={p.icon} size={28} strokeWidth={1.5} />
+            <span class="vx-platform-name">{p.name}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <div class="vx-section-cta">
+      <Button href={path('/download')} variant="ghost" iconAfter="arrow-right">
+        {t('home.download.cta')}
+      </Button>
+    </div>
+  </section>
+
+  <section class="vx-section vx-container" aria-labelledby="vx-cta-h">
+    <div class="vx-cta-card">
+      <div class="vx-cta-text">
+        <h2 id="vx-cta-h">{t('home.cta.heading')}</h2>
+        <p>{t('home.cta.lede')}</p>
+      </div>
+      <div class="vx-cta-actions">
+        <Button href={path('/download')} variant="primary" iconAfter="arrow-right">
+          {t('home.cta.primary')}
+        </Button>
+        <Button href={path('/privacy')} variant="ghost">
+          {t('home.cta.secondary')}
+        </Button>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .vx-hero {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    align-items: center;
+    padding-top: clamp(2.5rem, 6vw, 5rem);
+    padding-bottom: clamp(2.5rem, 6vw, 5rem);
+  }
+  @media (min-width: 960px) {
+    .vx-hero {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+      gap: 4rem;
+    }
+  }
+
+  .vx-hero-text { max-width: 36ch; }
+  .vx-hero-eyebrow { color: var(--vx-accent); font-size: 0.85rem; }
+  .vx-hero-title {
+    font-size: var(--vx-fs-display);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.02;
+    margin-top: 1.25rem;
+  }
+  .vx-hero-tag {
+    margin-top: 1.25rem;
+    color: var(--vx-text-secondary);
+    font-size: clamp(1.1rem, 0.95rem + 0.7vw, 1.4rem);
+    line-height: 1.4;
+  }
+  .vx-hero-sub {
+    margin-top: 0.85rem;
+    color: var(--vx-text-secondary);
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+  .vx-hero-actions {
+    margin-top: 2rem;
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .vx-section {
+    padding-top: clamp(3rem, 6vw, 5rem);
+    padding-bottom: clamp(3rem, 6vw, 5rem);
+  }
+
+  .vx-section-head {
+    max-width: 60ch;
+    margin: 0 auto 2.5rem;
+    text-align: center;
+  }
+  .vx-section-head h2 {
+    font-size: var(--vx-fs-h2);
+    letter-spacing: -0.015em;
+  }
+  .vx-section-head p {
+    margin-top: 0.85rem;
+    color: var(--vx-text-secondary);
+    font-size: 1.05rem;
+    line-height: 1.55;
+  }
+
+  .vx-feat-grid {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  @media (min-width: 640px) {
+    .vx-feat-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 1024px) {
+    .vx-feat-grid { grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+  }
+
+  .vx-how-grid {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  @media (min-width: 768px) {
+    .vx-how-grid { grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+  }
+  .vx-how-step {
+    padding: 1.5rem;
+    border-radius: var(--vx-radius);
+    background: var(--vx-bg-surface-muted);
+    border: 1px solid var(--vx-border-subtle);
+  }
+  .vx-how-num {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    color: var(--vx-accent);
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+  }
+  .vx-how-step h3 {
+    margin-top: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  .vx-how-step p {
+    margin-top: 0.5rem;
+    color: var(--vx-text-secondary);
+    line-height: 1.55;
+  }
+
+  .vx-platform-grid {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  @media (min-width: 540px) {
+    .vx-platform-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (min-width: 960px) {
+    .vx-platform-grid { grid-template-columns: repeat(6, 1fr); }
+  }
+  .vx-platform-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 1.25rem 0.75rem;
+    border-radius: var(--vx-radius);
+    background: var(--vx-bg-surface-elev);
+    border: 1px solid var(--vx-border-subtle);
+    color: var(--vx-text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+    transition: color 150ms ease, border-color 150ms ease, transform 150ms ease;
+  }
+  .vx-platform-tile:hover,
+  .vx-platform-tile:focus-visible {
+    color: var(--vx-text-primary);
+    border-color: var(--vx-accent);
+    transform: translateY(-2px);
+  }
+
+  .vx-section-cta {
+    margin-top: 1.75rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .vx-cta-card {
+    border-radius: var(--vx-radius-lg);
+    padding: clamp(1.75rem, 3vw, 3rem);
+    background: var(--vx-bg-surface);
+    border: 1px solid var(--vx-border-subtle);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    align-items: center;
+  }
+  @media (min-width: 768px) {
+    .vx-cta-card {
+      grid-template-columns: 1.4fr auto;
+      gap: 2rem;
+    }
+  }
+  .vx-cta-text h2 {
+    font-size: var(--vx-fs-h2);
+    letter-spacing: -0.015em;
+  }
+  .vx-cta-text p {
+    margin-top: 0.6rem;
+    color: var(--vx-text-secondary);
+    line-height: 1.55;
+    max-width: 50ch;
+  }
+  .vx-cta-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+</style>

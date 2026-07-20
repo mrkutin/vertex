@@ -1,0 +1,51 @@
+[Unit]
+Description=Vertex inline: router (vtx-gateway + split routing)
+Documentation=https://git.it-laboratory.com/mrkutin/vertex
+# WAN must be up so vtx-gateway can reach the broker; LAN must be up so
+# forwarded traffic from downstream router has a return path.
+After=vtx-inline-wan.service vtx-inline-lan.service network-online.target
+Requires=vtx-inline-wan.service vtx-inline-lan.service
+# Only start after bootstrap completed.
+ConditionPathExists=/etc/vertex-inline/.setup-done
+ConditionPathExists=/etc/vertex-inline/router.yaml
+ConditionPathExists=/etc/vertex-inline/inline.env
+# Permanent failure (wrong MQTT password, mismatched identity TOFU) shouldn't
+# cause a restart loop — give up after 10 fast restarts in 5 min.
+# These two keys belong in [Unit] (not [Service]) per systemd.unit(5).
+StartLimitIntervalSec=300
+StartLimitBurst=10
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/vertex-inline/inline.env
+
+# Mosquitto restart benefits from a small gap so the broker can cleanup
+# old sessions (matches production gateway pattern from PINGRESP fix).
+ExecStartPre=/bin/sleep 3
+
+# vtx-gateway is the existing production binary, used as-is. The `-config`
+# flag points at the inline-specific YAML. Standalone systemd ensures only
+# one instance runs at a time.
+ExecStart=/usr/local/bin/vtx-gateway -config /etc/vertex-inline/router.yaml
+
+# After vtx-gateway is up and TUN has an IP, install split-routing rules.
+# The script blocks up to 30s waiting on TUN; if it fails, the unit goes
+# into FAILED state and the iptables/routing rules are torn down by
+# ExecStopPost (which runs even when ExecStartPost fails, per systemd docs).
+ExecStartPost=/usr/local/bin/vtx-inline-proxy.sh setup
+
+ExecStopPost=/usr/local/bin/vtx-inline-proxy.sh cleanup
+
+Restart=on-failure
+RestartSec=5
+
+# ExecStartPre(3s) + ExecStart + ExecStartPost(TUN wait up to 30s + ru-nets
+# download + iptables setup) can take ~60s normally; headroom for slow brokers.
+TimeoutStartSec=120
+
+# Match production gateway's file descriptor budget — each MQTT broker
+# connection + TUN + worker pipelines can easily use 10k FDs.
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

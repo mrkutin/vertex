@@ -1,0 +1,163 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+import LangToggle from './LangToggle.astro';
+import { getLangFromUrl, useTranslations, useTranslatedPath } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const path = useTranslatedPath(lang);
+
+const SUPPORT_EMAIL = 'support@vertices.ru';
+---
+
+<footer class="vx-footer">
+  <div class="vx-footer-inner vx-container">
+    <div class="vx-footer-brand">
+      <a href={path('/')} class="vx-brand" aria-label="Vertex — home">
+        <span class="vx-brand-dot" aria-hidden="true"></span>
+        <span class="vx-wordmark">VERTEX</span>
+      </a>
+      <p class="vx-footer-tagline">{t('footer.tagline')}</p>
+    </div>
+
+    <nav class="vx-footer-col" aria-label={t('footer.product')}>
+      <h2>{t('footer.product')}</h2>
+      <ul role="list">
+        <li><a href={path('/features')}>{t('nav.features')}</a></li>
+        <li><a href={path('/download')}>{t('nav.download')}</a></li>
+      </ul>
+    </nav>
+
+    <nav class="vx-footer-col" aria-label={t('footer.legal')}>
+      <h2>{t('footer.legal')}</h2>
+      <ul role="list">
+        <li><a href={path('/privacy')}>{t('footer.privacy')}</a></li>
+        <li><a href={path('/terms')}>{t('footer.terms')}</a></li>
+        <li><a href={path('/support')}>{t('footer.support')}</a></li>
+        <li>
+          <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="vx-footer-bottom vx-container">
+    <span class="vx-footer-copyright">{t('footer.copyright')}</span>
+    <div class="vx-footer-toggles">
+      <ThemeToggle />
+      <LangToggle />
+    </div>
+  </div>
+</footer>
+
+<style>
+  .vx-footer {
+    margin-top: 6rem;
+    padding-top: 4rem;
+    padding-bottom: 2rem;
+    border-top: 1px solid var(--vx-border-subtle);
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      var(--vx-bg-surface-muted) 100%
+    );
+  }
+
+  .vx-footer-inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    padding-bottom: 2.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .vx-footer-inner {
+      grid-template-columns: 1.4fr 1fr 1.2fr;
+      gap: 2rem;
+    }
+  }
+
+  .vx-footer-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .vx-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    color: var(--vx-text-primary);
+  }
+  .vx-brand-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--vx-accent);
+    box-shadow: 0 0 12px var(--vx-glow-primary);
+  }
+
+  .vx-footer-tagline {
+    color: var(--vx-text-secondary);
+    font-size: 0.95rem;
+    max-width: 32ch;
+  }
+
+  .vx-footer-col h2 {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--vx-text-tertiary);
+    margin-bottom: 0.85rem;
+  }
+
+  .vx-footer-col ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    list-style: none;
+  }
+
+  .vx-footer-col a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--vx-text-secondary);
+    font-size: 0.92rem;
+    transition: color 150ms ease;
+  }
+  .vx-footer-col a:hover,
+  .vx-footer-col a:focus-visible {
+    color: var(--vx-text-primary);
+  }
+
+  .vx-footer-bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--vx-border-subtle);
+    color: var(--vx-text-tertiary);
+    font-size: 0.85rem;
+  }
+
+  @media (min-width: 640px) {
+    .vx-footer-bottom {
+      flex-direction: row;
+      justify-content: space-between;
+    }
+  }
+
+  .vx-footer-toggles {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .vx-footer-toggles {
+      display: none;
+    }
+  }
+</style>

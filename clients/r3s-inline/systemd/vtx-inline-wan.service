@@ -1,0 +1,21 @@
+[Unit]
+Description=Vertex inline: WAN (PPPoE or Ethernet+DHCP on eth0)
+Documentation=https://git.it-laboratory.com/mrkutin/vertex
+# Wait for eth0 hardware + networkd. Bootstrap must have written inline.env first.
+After=network-pre.target systemd-networkd.service sys-subsystem-net-devices-eth0.device
+Requires=systemd-networkd.service
+# Only start when bootstrap has completed (sentinel + inline.env present).
+ConditionPathExists=/etc/vertex-inline/.setup-done
+ConditionPathExists=/etc/vertex-inline/inline.env
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+EnvironmentFile=/etc/vertex-inline/inline.env
+ExecStart=/usr/local/bin/vtx-inline-wan-up.sh
+ExecStop=/usr/local/bin/vtx-inline-wan-down.sh
+# WAN bring-up can take up to 60s (PPPoE LCP negotiation).
+TimeoutStartSec=90
+
+[Install]
+WantedBy=multi-user.target

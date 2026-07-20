@@ -1,0 +1,99 @@
+---
+title: Support
+description: Quick fixes for the most common issues, an FAQ for the curious, and where to reach a human.
+lastUpdated: '2026-05-07'
+---
+
+If something is broken, the chance that it's covered below is high. If not, write to [support@vertices.ru](mailto:support@vertices.ru) — we read every email.
+
+## Quick troubleshoot
+
+### "Connect" hangs or fails immediately
+
+Most often this is a stale session on the relay vertex.
+
+1. Quit the app fully (swipe it out of the task switcher on iOS / Android, `cmd+Q` on macOS).
+2. Wait 10 seconds.
+3. Re-launch and tap Connect again.
+
+If it still fails, try a different relay vertex manually if your platform exposes the option, or switch to a different network (Wi-Fi → cellular).
+
+### "Connected" but no internet
+
+The most common cause is the device picked up a captive portal redirect on the underlying network. Disconnect Vertex, open a browser and visit `http://example.com` — if you see a Wi-Fi login page, complete it, then reconnect Vertex.
+
+If captive portal isn't the issue, the exit server may be saturated or the path through the relay vertex is degraded. Disconnect, pick a different exit in the exit picker, and reconnect.
+
+### "Identity check failed" or "Device not recognized"
+
+Your device's identity public key is unknown to the exit server. This happens if you reinstalled the app, restored from a backup that didn't include the keychain, or are connecting to a new exit. Email [support@vertices.ru](mailto:support@vertices.ru) with your username and we'll re-register your device on the exit (TOFU reset).
+
+## Frequently asked questions
+
+### What is a vertex node?
+
+A vertex is a public TCP/TLS relay point that both your device and the exit server connect to. Instead of your device opening a direct tunnel to the exit (visible on the wire as a VPN), packets travel through the vertex as opaque, encrypted blobs. To external observers your device only talks to a generic public endpoint, not to a specific VPN server. The vertex itself can't read your traffic — we use end-to-end encryption between your device and the exit server, so the vertex only sees ciphertext.
+
+### How is Vertex different from WireGuard or OpenVPN?
+
+WireGuard and OpenVPN open a direct tunnel between your device and the VPN server. That direct flow is signature-detectable by deep-packet-inspection systems. Vertex inserts a relay vertex between client and exit; the vertex can't decrypt traffic (we use end-to-end X25519 + ChaCha20-Poly1305 between client and exit) but it provides a layer of indirection that masks the topology from passive observers. Trade-off: Vertex adds one network hop, so latency is slightly higher than WireGuard. Throughput on residential networks is comparable (we measure 100+ Mbps both ways over Ethernet).
+
+### Why is the Android app not on Google Play?
+
+Google Play's policies for VPN apps require us to disclose data to Google and accept telemetry obligations that conflict with our zero-data design. The native APK is in development; we'll publish it on the Download page when it's ready.
+
+### Why multiple relay vertices?
+
+Resilience. We run several independent relay vertices so a failure of one — outage, IP block, lease expiry — doesn't take the service down. Your client automatically fails over to the next available vertex in roughly 100 ms.
+
+### Where are the exit servers?
+
+We operate multiple exit nodes hosted across independent regions, so you can choose one closer to the destination you need or fall back to another if one is congested. The current list is visible in the app's exit picker; all exits run identical software and have equal access controls.
+
+### What's a "device identity key"?
+
+A 32-byte X25519 public/private keypair that your client generates on first launch. The public half is sent to the exit during the handshake; the exit pins it the first time it sees it (Trust On First Use, TOFU) and refuses any subsequent connection from the same username with a different identity key. This prevents credential sharing — leaking your password is not enough; an attacker would also need the file on your device that holds your identity key.
+
+### Can I use Vertex on my router?
+
+Yes. The `vtx-gateway` binary turns a Linux router (we test on the NanoPi R3S) into a transparent Vertex gateway with split routing. Email [support@vertices.ru](mailto:support@vertices.ru) and we'll send you the install script with deployment notes.
+
+### Does Vertex collect any personal data?
+
+No. The full list of what we touch is in the [Privacy Policy](/privacy/). The short version: a username, a hashed password, your device's identity public key, and ephemeral relay logs (7-day retention). No traffic content, no DNS queries, no analytics.
+
+## Platform guides
+
+### iOS
+
+iOS 17 and newer. Install via the App Store (where available). The app uses Apple's NetworkExtension framework and runs the tunnel inside a system-managed extension. First launch will request permission to add a VPN configuration to your device — this is normal.
+
+### macOS
+
+macOS 14 (Sonoma) and newer, Apple Silicon. Native build coming soon — see the Download page.
+
+### Android
+
+Android 8 (API 26) and newer. Native build coming soon — see the Download page.
+
+### Linux
+
+Any modern x86_64 / arm64 Linux desktop. Native build planned. Email [support@vertices.ru](mailto:support@vertices.ru) if you need an early build.
+
+### Gateway (R3S)
+
+For installing Vertex on a NanoPi R3S or other small Linux router, email [support@vertices.ru](mailto:support@vertices.ru) to request the install script and deployment notes.
+
+## Diagnostics
+
+If you need to send us logs:
+
+- **iOS / macOS**: open the app, tap "Diagnostics", export the bundle, and email it to [support@vertices.ru](mailto:support@vertices.ru).
+- **Android**: long-press the connect button to reveal the diagnostics action, export, and email.
+- **Linux / Gateway**: run `vtx-client --json --verbose` (or `vtx-gateway --json --verbose`) and copy the last 200 lines.
+
+We do not collect logs proactively; we only see what you choose to send.
+
+## Contact
+
+Email: [support@vertices.ru](mailto:support@vertices.ru)

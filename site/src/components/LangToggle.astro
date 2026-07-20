@@ -1,0 +1,46 @@
+---
+import { getLangFromUrl, alternatePath, useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const target: Lang = lang === 'en' ? 'ru' : 'en';
+const targetPath = alternatePath(Astro.url, target);
+const targetLabel = target === 'en' ? 'EN' : 'RU';
+---
+
+<a
+  href={targetPath}
+  class="vx-lang-toggle"
+  aria-label={t('lang.toggle')}
+  title={t('lang.toggle')}
+  hreflang={target}
+  data-vx-lang-toggle
+>
+  {targetLabel}
+</a>
+
+<style>
+  .vx-lang-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    border: 1px solid var(--vx-border-subtle);
+    color: var(--vx-text-secondary);
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    transition: color 150ms ease, border-color 150ms ease, background 150ms ease;
+  }
+
+  .vx-lang-toggle:hover,
+  .vx-lang-toggle:focus-visible {
+    color: var(--vx-text-primary);
+    border-color: var(--vx-border-strong);
+    background: var(--vx-bg-surface-muted);
+  }
+</style>

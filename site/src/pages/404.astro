@@ -1,0 +1,108 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { useTranslatedPath } from '../i18n/utils';
+
+const path = useTranslatedPath('en');
+---
+
+<BaseLayout title="Page not found — Vertex" description="That URL leads nowhere on this site." noindex>
+  <section class="vx-404 vx-container">
+    <div class="vx-404-mark" aria-hidden="true">
+      <svg viewBox="0 0 200 200" width="120" height="120">
+        <defs>
+          <radialGradient id="vx-404-halo" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="var(--vx-accent)" stop-opacity="0.5" />
+            <stop offset="100%" stop-color="var(--vx-accent)" stop-opacity="0" />
+          </radialGradient>
+        </defs>
+        <circle cx="100" cy="100" r="80" fill="url(#vx-404-halo)" />
+        <line x1="100" y1="100" x2="30" y2="30" stroke="var(--vx-border-strong)" stroke-width="1.2" />
+        <line x1="100" y1="100" x2="170" y2="40" stroke="var(--vx-border-strong)" stroke-width="1.2" />
+        <line x1="100" y1="100" x2="40" y2="170" stroke="var(--vx-border-strong)" stroke-width="1.2" stroke-dasharray="4 4" />
+        <circle cx="30" cy="30" r="4" fill="var(--vx-text-tertiary)" />
+        <circle cx="170" cy="40" r="4" fill="var(--vx-text-tertiary)" />
+        <circle cx="40" cy="170" r="4" fill="var(--vx-text-tertiary)" opacity="0.5" />
+        <circle cx="100" cy="100" r="10" fill="#FFFFFF" />
+      </svg>
+    </div>
+    <p class="vx-eyebrow">404</p>
+    <h1 class="vx-404-title">Page not found</h1>
+    <p class="vx-404-lede">
+      The path you followed doesn't lead anywhere on this site. If you typed it, double-check the
+      spelling. Otherwise the page may have moved.
+    </p>
+    <div class="vx-404-actions">
+      <a class="vx-btn vx-btn-primary" href={path('/')}>
+        <Icon name="arrow-right" size={16} />
+        <span>Back home</span>
+      </a>
+      <a class="vx-btn vx-btn-ghost" href={path('/support')}>
+        <span>Get support</span>
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .vx-404 {
+    text-align: center;
+    padding-top: clamp(3rem, 8vw, 6rem);
+    padding-bottom: clamp(3rem, 8vw, 6rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  .vx-404-mark {
+    margin-bottom: 0.5rem;
+    opacity: 0.95;
+  }
+  .vx-eyebrow {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.85rem;
+    letter-spacing: 0.18em;
+    color: var(--vx-accent);
+  }
+  .vx-404-title {
+    font-size: var(--vx-fs-h1);
+    margin-top: 0.25rem;
+  }
+  .vx-404-lede {
+    color: var(--vx-text-secondary);
+    max-width: 48ch;
+    margin: 0.5rem auto 0;
+  }
+  .vx-404-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .vx-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 44px;
+    padding: 0 1.1rem;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+  }
+  .vx-btn-primary {
+    background: var(--vx-accent);
+    color: var(--vx-text-on-accent);
+  }
+  .vx-btn-primary:hover {
+    background: var(--vx-accent-hover);
+  }
+  .vx-btn-ghost {
+    border: 1px solid var(--vx-border-strong);
+    color: var(--vx-text-primary);
+  }
+  .vx-btn-ghost:hover {
+    background: var(--vx-bg-surface-muted);
+  }
+</style>

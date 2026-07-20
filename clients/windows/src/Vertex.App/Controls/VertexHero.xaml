@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="Vertex.App.Controls.VertexHero"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml">
+
+    <!-- Two-layer host: the static fallback paints first so we always
+         have something to show. The Win2D animated surface stacks on top;
+         on a VM where Direct2D init throws we keep the surface invisible
+         and fall back to the static V. The code-behind decides at runtime
+         based on UseWin2D. -->
+    <Grid x:Name="Host" Width="268" Height="268" HorizontalAlignment="Center">
+        <!-- Static fallback — same V geometry as Phase 1, drawn with
+             plain Shapes. Shows when UseWin2D=false. -->
+        <Canvas x:Name="StaticGeo"
+                Width="220" Height="220"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"/>
+
+        <canvas:CanvasAnimatedControl x:Name="Surface"
+                                      Visibility="Collapsed"
+                                      ClearColor="Transparent"
+                                      TargetElapsedTime="0:0:0.0333"
+                                      CreateResources="OnCreateResources"
+                                      Draw="OnDraw"/>
+    </Grid>
+</UserControl>
