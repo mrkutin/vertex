@@ -1,0 +1,36 @@
+[Unit]
+Description=Vertex inline: LAN (eth1 static + dnsmasq DHCP)
+Documentation=https://git.it-laboratory.com/mrkutin/vertex
+# After= waits for eth1 device + networkd. ConditionPathExists removed to avoid race
+# with sys-subsystem-net-devices-eth1.device which is the authoritative wait.
+After=network-pre.target systemd-networkd.service sys-subsystem-net-devices-eth1.device
+Requires=systemd-networkd.service
+Wants=dnsmasq.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+
+# Re-read /etc/systemd/network/20-vtx-lan.network and apply to eth1 (idempotent).
+ExecStart=/usr/bin/networkctl reload
+ExecStart=/usr/bin/networkctl reconfigure eth1
+
+# Wait until eth1 actually has the configured IP. `networkctl reconfigure` is async;
+# we retry up to 10s to avoid false-fail on cold boot.
+ExecStart=/bin/sh -c 'for i in 1 2 3 4 5 6 7 8 9 10; do ip -4 addr show eth1 2>/dev/null | grep -q "inet 192.168.42.1/24" && exit 0; sleep 1; done; echo "ERROR: eth1 has no 192.168.42.1/24 after 10s"; exit 1'
+
+# Ensure dnsmasq config is in place. install.sh symlinks /etc/dnsmasq.d/vtx-inline.conf
+# to the central /etc/vertex-inline/dnsmasq.inline.conf; this is a safety net.
+ExecStart=/bin/sh -c 'test -e /etc/dnsmasq.d/vtx-inline.conf || ln -sf /etc/vertex-inline/dnsmasq.inline.conf /etc/dnsmasq.d/vtx-inline.conf'
+
+# reload-or-restart: works whether dnsmasq is currently running or not. Wants= already
+# pulls it in, but reload-or-restart is idempotent if start ordering swapped.
+ExecStart=/usr/bin/systemctl reload-or-restart dnsmasq.service
+
+# On stop, fully stop dnsmasq (we own it on this box; install.sh masks any conflicting
+# default unit) and remove our config snippet.
+ExecStop=/usr/bin/systemctl stop dnsmasq.service
+ExecStop=/bin/sh -c 'rm -f /etc/dnsmasq.d/vtx-inline.conf'
+
+[Install]
+WantedBy=multi-user.target

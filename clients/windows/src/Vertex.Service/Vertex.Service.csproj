@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.18362.0</SupportedOSPlatformVersion>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Vertex.Service</RootNamespace>
+    <AssemblyName>Vertex.Service</AssemblyName>
+    <UserSecretsId>vertex-service</UserSecretsId>
+    <UseWindowsService>true</UseWindowsService>
+
+    <!-- WinTUN P/Invoke needs unsafe pointer arithmetic for the
+         zero-copy receive / send buffer copies. Scope is small and
+         contained in `Tun/WintunDevice.cs`. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <!-- Self-contained publish flags are set at publish time via make.ps1. -->
+    <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.*" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.0.*" />
+    <!-- DPAPI LocalMachine for identity / password / state at-rest. -->
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="8.0.*" />
+    <!-- Named-pipe ACLs (PipeSecurity, AccessRule). -->
+    <PackageReference Include="System.IO.Pipes.AccessControl" Version="5.0.*" />
+    <!-- ServiceController for Dnscache PARAMCHANGE notification (DnsLeakGuard). -->
+    <PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vertex.Core\Vertex.Core.csproj" />
+    <ProjectReference Include="..\Vertex.Shared\Vertex.Shared.csproj" />
+  </ItemGroup>
+
+  <!-- Bundled RU CIDR aggregated zone — paritет с macOS / Android.
+       Copied to the publish output so RuNetsLoader can read it before
+       the first ipdeny refresh succeeds. -->
+  <ItemGroup>
+    <None Update="Resources\ru-aggregated.zone">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

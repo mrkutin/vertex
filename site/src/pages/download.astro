@@ -1,0 +1,277 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import DownloadCard from '../components/DownloadCard.astro';
+import Button from '../components/Button.astro';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const LINUX_NOTIFY_MAILTO = 'mailto:support@vertices.ru?subject=Vertex%20for%20Linux%20%E2%80%94%20notify%20me';
+const GW_REQUEST_MAILTO = 'mailto:support@vertices.ru?subject=Vertex%20Gateway%20install%20script';
+
+// Pinned release artifacts hosted on vertices.ru/downloads/.
+// Bump when a new build is uploaded; the SHA-256 must match the file.
+const RELEASES = {
+  macos:   { version: '2.11.1', file: 'Vertex-macos-v2.11.1.app.zip',   size: '2.1 MB',  sha256: 'db3771eb1c10010ce55f670c2f328afbd8876e06801e73259021ebe1f23c91eb' },
+  android: { version: '2.11.1', file: 'Vertex-android-v2.11.1.apk',     size: '5.1 MB',  sha256: 'f5ba9d1b351f44b7c5a3ad43f4af7a35136bb900fff5a76c1ade83a5c1fe1b61' },
+  windows: { version: '0.1.5',  file: 'Vertex-windows-v0.1.5-x64.msi',  size: '79 MB',   sha256: 'b919f69b7fc2c009634e31db54acdcab340b017b8961228662aed8459f89130b' },
+} as const;
+
+const url = (file: string) => `/downloads/${file}`;
+---
+
+<BaseLayout title={t('download.title')} description={t('download.lede')}>
+  <div class="vx-dl-page vx-container">
+    <header class="vx-dl-page-head">
+      <h1>{t('download.heading')}</h1>
+      <p>{t('download.lede')}</p>
+      <p class="vx-dl-detected" data-vx-detected hidden>
+        <span data-vx-detected-text></span>
+      </p>
+    </header>
+
+    <div class="vx-dl-grid">
+      {/* macOS */}
+      <DownloadCard
+        id="macos"
+        icon="monitor"
+        platform={t('download.platform.macos')}
+        note={t('download.macosNote')}
+      >
+        <Fragment slot="actions">
+          <Button href={url(RELEASES.macos.file)} variant="primary" icon="arrow-right">
+            {t('download.cta.mac')}
+          </Button>
+        </Fragment>
+        <Fragment slot="extra">
+          <details class="vx-dl-details">
+            <summary>{t('download.verify')}</summary>
+            <p><strong>{t('download.size')}:</strong> {RELEASES.macos.size}</p>
+            <p><strong>v{RELEASES.macos.version}</strong></p>
+            <p><strong>{t('download.sha256')}:</strong></p>
+            <pre>{RELEASES.macos.sha256}</pre>
+          </details>
+        </Fragment>
+      </DownloadCard>
+
+      {/* iOS */}
+      <DownloadCard
+        id="ios"
+        icon="apple"
+        platform={t('download.platform.ios')}
+        note={t('download.iosNote')}
+        state="soon"
+      />
+
+      {/* Linux */}
+      <DownloadCard
+        id="linux"
+        icon="terminal"
+        platform={t('download.platform.linux')}
+        note={t('download.linuxNote')}
+        state="soon"
+      >
+        <Fragment slot="actions">
+          <Button href={LINUX_NOTIFY_MAILTO} variant="ghost" icon="mail">
+            {t('download.notify')}
+          </Button>
+        </Fragment>
+      </DownloadCard>
+
+      {/* Android */}
+      <DownloadCard
+        id="android"
+        icon="smartphone"
+        platform={t('download.platform.android')}
+        note={t('download.androidNote')}
+      >
+        <Fragment slot="actions">
+          <Button href={url(RELEASES.android.file)} variant="primary" icon="arrow-right">
+            {t('download.cta.android')}
+          </Button>
+        </Fragment>
+        <Fragment slot="extra">
+          <details class="vx-dl-details">
+            <summary>{t('download.verify')}</summary>
+            <p><strong>{t('download.size')}:</strong> {RELEASES.android.size}</p>
+            <p><strong>v{RELEASES.android.version}</strong></p>
+            <p><strong>{t('download.sha256')}:</strong></p>
+            <pre>{RELEASES.android.sha256}</pre>
+          </details>
+        </Fragment>
+      </DownloadCard>
+
+      {/* Windows */}
+      <DownloadCard
+        id="windows"
+        icon="monitor"
+        platform={t('download.platform.windows')}
+        note={t('download.windowsNote')}
+      >
+        <Fragment slot="actions">
+          <Button href={url(RELEASES.windows.file)} variant="primary" icon="arrow-right">
+            {t('download.cta.windows')}
+          </Button>
+        </Fragment>
+        <Fragment slot="extra">
+          <details class="vx-dl-details">
+            <summary>{t('download.verify')}</summary>
+            <p><strong>{t('download.size')}:</strong> {RELEASES.windows.size}</p>
+            <p><strong>v{RELEASES.windows.version}</strong></p>
+            <p><strong>{t('download.sha256')}:</strong></p>
+            <pre>{RELEASES.windows.sha256}</pre>
+          </details>
+        </Fragment>
+      </DownloadCard>
+
+      {/* Gateway */}
+      <DownloadCard
+        id="gateway"
+        icon="router"
+        platform={t('download.platform.gateway')}
+        note={t('download.gatewayNote')}
+        state="external"
+      >
+        <Fragment slot="actions">
+          <Button href={GW_REQUEST_MAILTO} variant="ghost" icon="mail">
+            {t('download.requestScript')}
+          </Button>
+        </Fragment>
+      </DownloadCard>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .vx-dl-page {
+    padding-top: clamp(2.5rem, 6vw, 4.5rem);
+    padding-bottom: clamp(3rem, 6vw, 5rem);
+  }
+  .vx-dl-page-head {
+    text-align: center;
+    max-width: 65ch;
+    margin: 0 auto 3rem;
+  }
+  .vx-dl-page-head h1 {
+    font-size: var(--vx-fs-h1);
+    letter-spacing: -0.015em;
+  }
+  .vx-dl-page-head p {
+    margin-top: 1rem;
+    color: var(--vx-text-secondary);
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+  .vx-dl-detected {
+    margin-top: 1.25rem;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.85rem;
+    color: var(--vx-accent);
+  }
+
+  .vx-dl-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  @media (min-width: 700px) {
+    .vx-dl-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+  }
+  @media (min-width: 1100px) {
+    .vx-dl-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .vx-dl-details {
+    margin-top: 0.5rem;
+    border-top: 1px solid var(--vx-border-subtle);
+    padding-top: 0.85rem;
+  }
+  .vx-dl-details summary {
+    cursor: pointer;
+    color: var(--vx-text-secondary);
+    font-size: 0.92rem;
+    font-weight: 500;
+    list-style: none;
+    padding-right: 0.5rem;
+    transition: color 150ms ease;
+  }
+  .vx-dl-details summary::after {
+    content: '+';
+    float: right;
+    color: var(--vx-text-tertiary);
+    font-size: 1.05rem;
+    transition: transform 150ms ease;
+  }
+  .vx-dl-details[open] summary::after {
+    content: '−';
+  }
+  .vx-dl-details summary:hover {
+    color: var(--vx-text-primary);
+  }
+  .vx-dl-details > p,
+  .vx-dl-details > ol {
+    margin-top: 0.7rem;
+    color: var(--vx-text-secondary);
+    line-height: 1.55;
+    font-size: 0.92rem;
+  }
+  .vx-dl-details ol {
+    padding-left: 1.2rem;
+    list-style: decimal;
+  }
+  .vx-dl-details li { margin-top: 0.35em; }
+  .vx-dl-details pre {
+    margin-top: 0.7rem;
+    background: var(--vx-bg-canvas-bottom);
+    border: 1px solid var(--vx-border-subtle);
+    border-radius: var(--vx-radius-sm);
+    padding: 0.7rem 0.85rem;
+    overflow-x: auto;
+    font-size: 0.82rem;
+    color: var(--vx-text-primary);
+  }
+
+</style>
+
+<script>
+  (() => {
+    const ua = navigator.userAgent;
+    const platform = navigator.platform || '';
+    const detect = (): { id: string; label: string } | null => {
+      if (/iPhone|iPad|iPod/.test(ua)) return { id: 'ios', label: 'iOS' };
+      if (/Android/.test(ua)) return { id: 'android', label: 'Android' };
+      if (/Mac|Macintosh|MacIntel|MacPPC|Mac68K/.test(platform) || /Mac OS X/.test(ua)) {
+        return { id: 'macos', label: 'macOS' };
+      }
+      if (/Win32|Win64|Windows|WinCE/.test(platform) || /Windows NT/.test(ua)) {
+        return { id: 'windows', label: 'Windows' };
+      }
+      if (/Linux/.test(platform) || /Linux/.test(ua)) return { id: 'linux', label: 'Linux' };
+      return null;
+    };
+
+    const det = detect();
+    if (!det) return;
+
+    const card = document.getElementById(det.id);
+    if (card) {
+      card.setAttribute('data-current', 'true');
+      // Move it visually to the top of the grid via the order CSS property —
+      // but to keep tab order intact we just prepend to the parent.
+      const grid = card.parentElement;
+      if (grid) {
+        grid.insertBefore(card, grid.firstChild);
+      }
+    }
+
+    const banner = document.querySelector<HTMLElement>('[data-vx-detected]');
+    const text = document.querySelector<HTMLElement>('[data-vx-detected-text]');
+    if (banner && text) {
+      const lang = document.documentElement.lang === 'ru' ? 'ru' : 'en';
+      const prefix = lang === 'ru' ? 'Похоже, вы на' : 'It looks like you\'re on';
+      text.textContent = `${prefix} ${det.label}`;
+      banner.hidden = false;
+    }
+  })();
+</script>

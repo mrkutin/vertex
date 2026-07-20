@@ -1,0 +1,16 @@
+#!/bin/sh
+# pppd ip-up.d hook for Vertex R3S-inline.
+# Installed to /etc/ppp/ip-up.d/00-vtx-inline by install.sh.
+#
+# pppd invokes: $1=interface ($PPP_IFACE), $2=tty, $3=speed, $4=local_ip,
+#               $5=remote_ip, $6=ipparam
+# We only care when our pppoe0 (named via ifname directive) comes up.
+#
+# We DON'T kick vtx-inline-router from here: vtx-gateway has its own MQTT
+# reconnect loop (paho autopaho), and restarting the unit on every PPPoE flap
+# kills TUN + clears DH session unnecessarily. Just log.
+
+[ "$1" = "pppoe0" ] || exit 0
+
+logger -t vtx-inline "pppoe0 up: local=$4 remote=$5"
+exit 0

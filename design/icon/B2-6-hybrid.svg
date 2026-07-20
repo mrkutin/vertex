@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- B2-6: Hybrid base — extend + glow at vertex, on deep blue radial. -->
+  <defs>
+    <radialGradient id="bg6" cx="50%" cy="70%" r="65%">
+      <stop offset="0%" stop-color="#1A2B5F"/>
+      <stop offset="100%" stop-color="#0A1129"/>
+    </radialGradient>
+    <radialGradient id="glow6" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.55"/>
+      <stop offset="40%" stop-color="#7DB3FF" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#7DB3FF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg6)"/>
+  <!-- Vertex glow halo -->
+  <circle cx="512" cy="720" r="240" fill="url(#glow6)"/>
+  <!-- Extended edges (rays going past endpoint dots) -->
+  <line x1="241" y1="234" x2="512" y2="720" stroke="#FFFFFF" stroke-width="56" stroke-linecap="round"/>
+  <line x1="783" y1="234" x2="512" y2="720" stroke="#FFFFFF" stroke-width="56" stroke-linecap="round"/>
+  <!-- Endpoint dots -->
+  <circle cx="280" cy="304" r="48" fill="#FFFFFF"/>
+  <circle cx="744" cy="304" r="48" fill="#FFFFFF"/>
+  <!-- Vertex dot -->
+  <circle cx="512" cy="720" r="72" fill="#FFFFFF"/>
+</svg>

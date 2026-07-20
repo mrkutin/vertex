@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- B2-7: Bolder — longer rays, brighter glow. -->
+  <defs>
+    <radialGradient id="bg7" cx="50%" cy="72%" r="70%">
+      <stop offset="0%" stop-color="#1F3270"/>
+      <stop offset="100%" stop-color="#070D22"/>
+    </radialGradient>
+    <radialGradient id="glow7" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.75"/>
+      <stop offset="35%" stop-color="#9BC4FF" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#9BC4FF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg7)"/>
+  <!-- Larger, stronger vertex glow -->
+  <circle cx="512" cy="720" r="320" fill="url(#glow7)"/>
+  <!-- Longer extensions (~150px past dots) -->
+  <!-- Direction unit (-0.487, -0.873). 150px past (280, 304) = (280-73, 304-131) = (207, 173) -->
+  <line x1="207" y1="173" x2="512" y2="720" stroke="#FFFFFF" stroke-width="60" stroke-linecap="round"/>
+  <line x1="817" y1="173" x2="512" y2="720" stroke="#FFFFFF" stroke-width="60" stroke-linecap="round"/>
+  <circle cx="280" cy="304" r="50" fill="#FFFFFF"/>
+  <circle cx="744" cy="304" r="50" fill="#FFFFFF"/>
+  <circle cx="512" cy="720" r="80" fill="#FFFFFF"/>
+</svg>

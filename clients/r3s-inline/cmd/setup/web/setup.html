@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vertex R3S — настройка</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<main>
+  <h1>Vertex R3S</h1>
+  {{if .Reconfigure}}
+    <p class="lede">Изменение настроек. VPN перезапустится после применения.</p>
+  {{else}}
+    <p class="lede">Первоначальная настройка. После сохранения R3S подключится к VPN.</p>
+  {{end}}
+
+  {{if .Error}}<div class="error">{{.Error}}</div>{{end}}
+
+  <form method="POST" action="/submit" autocomplete="off">
+    <input type="hidden" name="csrf" value="{{.CSRF}}">
+
+    <fieldset>
+      <legend>Тип подключения к интернету (WAN)</legend>
+      <label class="radio">
+        <input type="radio" name="wan_mode" value="pppoe" {{if or (not .Prev) (eq .Prev.WANMode "pppoe")}}checked{{end}}>
+        PPPoE (Ростелеком, МТС и др. — с логином/паролем)
+      </label>
+      <label class="radio">
+        <input type="radio" name="wan_mode" value="dhcp" {{if and .Prev (eq .Prev.WANMode "dhcp")}}checked{{end}}>
+        Ethernet + DHCP (если провайдер не требует логин)
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>PPPoE учётные данные (если выбран PPPoE)</legend>
+      <label>Логин провайдера
+        <input name="pppoe_user" value="{{if .Prev}}{{.Prev.PPPoEUser}}{{end}}" autocomplete="off">
+      </label>
+      <label>Пароль провайдера
+        <input name="pppoe_password" type="password" autocomplete="new-password">
+        {{if .Reconfigure}}<small>Оставьте пустым чтобы сохранить текущий.</small>{{end}}
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Vertex (данные от администратора)</legend>
+      <label>Имя клиента
+        <input name="client_name" required pattern="[a-z0-9][a-z0-9-]{1,30}"
+               value="{{if .Prev}}{{.Prev.ClientName}}{{end}}" autocomplete="off">
+        <small>Латиница, цифры, дефис. Без пробелов и заглавных. 2–31 символ.</small>
+      </label>
+      <label>MQTT-пароль
+        <input name="mqtt_password" type="password" {{if not .Reconfigure}}required minlength="8"{{end}} autocomplete="new-password">
+        {{if .Reconfigure}}<small>Оставьте пустым чтобы сохранить текущий.</small>{{end}}
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Брокер (через какой узел подключаемся к Vertex)</legend>
+      <label class="radio">
+        <input type="radio" name="broker" value="auto" {{if or (not .Prev) (eq .Prev.Broker "auto") (eq .Prev.Broker "")}}checked{{end}}>
+        Auto — выбирается по RTT (все брокеры, MQTTS + WSS fallback)
+      </label>
+      {{range .Brokers}}
+      <label class="radio">
+        <input type="radio" name="broker" value="{{.ID}}" {{if and $.Prev (eq $.Prev.Broker .ID)}}checked{{end}}>
+        {{.Label}}
+      </label>
+      {{end}}
+      <small>MQTTS = порт 8883, WSS = порт 443 (для сетей где 8883 заблокирован DPI).</small>
+      {{if eq .SRVSource "fallback"}}<small>SRV-запрос недоступен (нет интернета?), список из локального fallback.</small>{{end}}
+    </fieldset>
+
+    <fieldset>
+      <legend>Exit-нода (через какую страну выходит трафик)</legend>
+      <label class="radio">
+        <input type="radio" name="exit" value="auto" {{if or (not .Prev) (eq .Prev.Exit "auto") (eq .Prev.Exit "")}}checked{{end}}>
+        Auto — выбирается по RTT и нагрузке
+      </label>
+      {{range .Exits}}
+      <label class="radio">
+        <input type="radio" name="exit" value="{{.ID}}" {{if and $.Prev (eq $.Prev.Exit .ID)}}checked{{end}}>
+        {{.ID}}
+      </label>
+      {{end}}
+      {{if not .Exits}}<small>Список exit-нод сейчас недоступен. Auto подберёт ноду при первом подключении.</small>{{end}}
+    </fieldset>
+
+    <fieldset>
+      <legend>Отложенное применение</legend>
+      <label class="checkbox">
+        <input type="checkbox" name="save_only" value="1" {{if and .Prev .Prev.SaveOnly}}checked{{end}}>
+        Сохранить без применения — для переноса R3S в другую сеть
+      </label>
+      <small>Если галочка установлена — кнопка ниже сохранит настройки на диск, НЕ перезапуская сервисы. Текущий VPN (если работает) продолжит работать в памяти до выключения R3S. После выключения, переноса и включения в целевой сети — systemd запустит сервисы с новой конфигурацией.</small>
+    </fieldset>
+
+    <button type="submit">Сохранить и подключить</button>
+  </form>
+
+  <p class="note">Подключение займёт до минуты. Не перезагружайте R3S во время настройки.</p>
+</main>
+</body>
+</html>

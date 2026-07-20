@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- B2-3: V with hollow ring at vertex. White on black. -->
+  <rect width="1024" height="1024" fill="#000000"/>
+  <line x1="280" y1="304" x2="512" y2="720" stroke="#FFFFFF" stroke-width="56" stroke-linecap="round"/>
+  <line x1="744" y1="304" x2="512" y2="720" stroke="#FFFFFF" stroke-width="56" stroke-linecap="round"/>
+  <circle cx="280" cy="304" r="48" fill="#FFFFFF"/>
+  <circle cx="744" cy="304" r="48" fill="#FFFFFF"/>
+  <!-- Hollow vertex ring -->
+  <circle cx="512" cy="720" r="76" fill="none" stroke="#FFFFFF" stroke-width="28"/>
+</svg>

@@ -1,0 +1,68 @@
+---
+title: Privacy Policy
+description: How Vertex handles your data — and, more importantly, what we do not collect.
+lastUpdated: '2026-05-07'
+---
+
+**Effective date**: May 7, 2026
+
+## 1. Who we are
+
+Vertex is a privacy-focused VPN service operated by an independent team. Contact: [support@vertices.ru](mailto:support@vertices.ru).
+
+## 2. The bottom line
+
+> **We can't see your traffic. The relay vertex is mathematically blind.**
+
+Vertex uses end-to-end encryption (X25519 Diffie-Hellman + ChaCha20-Poly1305) between your device and the exit server. The relay vertex that forwards your packets — even one we operate ourselves — has no key material capable of decrypting them. It can only observe TCP-level metadata of the connection itself (source IP, packet timestamps, packet sizes), never the content.
+
+## 3. What data we collect
+
+To run the service, we process the minimum necessary:
+
+- **Account credentials**: a username (e.g., `vtx-client-yourname`) and a salted, hashed password (bcrypt) stored on the relay vertex for authentication.
+- **Device identity public key**: a 32-byte X25519 public key your client generates on first launch. Used for our anti-credential-sharing protection (TOFU pinning). The corresponding private key never leaves your device.
+- **Connection metadata**: ephemeral relay logs containing connection timestamps and source IP addresses, retained for up to 7 days for abuse prevention. Not linked to user identity beyond username.
+
+## 4. What we do NOT collect
+
+We do not store, log, or analyze:
+
+- Your traffic content (we cannot — see Section 2)
+- DNS queries
+- Browsing history or visited domains
+- Persistent device identifiers, advertising IDs
+- Location data, contacts, photos, microphone, or any device sensor data
+- Telemetry, analytics, crash reports (unless you opt-in via your operating system)
+
+## 5. Third parties
+
+Vertex runs on multiple independent infrastructure providers across several regions (sub-processors). They host our relay vertices and exit servers but see only encrypted traffic; they cannot read packet contents. The current list of providers and regions is available on request — email [support@vertices.ru](mailto:support@vertices.ru).
+
+We do not share user data with advertisers, analytics services, or any third party.
+
+## 6. Data retention
+
+- **Relay logs**: up to 7 days, then automatically rotated and destroyed.
+- **Account credentials**: retained while your account is active. Deleted on request.
+- **Device identity public keys**: retained on exit servers until you request deletion or your account is removed.
+
+## 7. Your rights
+
+Regardless of your jurisdiction, you have the following rights:
+
+- **Right to deletion** — email [support@vertices.ru](mailto:support@vertices.ru) with your username; we will remove your credentials and identity key entries within 30 days.
+- **Right to access** — request a copy of all data we hold about you (which is limited: username, identity public key hex, last-seen timestamp).
+- **Right to portability** — your identity key is stored on your device; you can export it yourself (see Support page).
+
+## 8. Children
+
+Vertex is not directed at users under 13 (or under 16 in jurisdictions with stricter rules under GDPR). We do not knowingly collect data from children.
+
+## 9. Changes to this policy
+
+If we materially change this policy, we will publish the new version on this page and update the "Last updated" date. Significant changes will be announced via the Support page.
+
+## 10. Contact
+
+General support: [support@vertices.ru](mailto:support@vertices.ru)

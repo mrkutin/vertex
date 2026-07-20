@@ -1,0 +1,113 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import { getLangFromUrl } from '../i18n/utils';
+
+interface Props {
+  title: string;
+  description?: string;
+  noindex?: boolean;
+  toc?: Array<{ depth: number; slug: string; text: string }>;
+}
+
+const { title, description, noindex, toc = [] } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const tocLabel = lang === 'ru' ? 'Содержание' : 'Table of contents';
+---
+
+<BaseLayout title={title} description={description} noindex={noindex}>
+  <div class="vx-doc vx-container">
+    {toc.length > 0 && (
+      <aside class="vx-doc-toc" aria-label={tocLabel}>
+        <nav>
+          <p class="vx-doc-toc-heading">{tocLabel}</p>
+          <ul role="list">
+            {toc.map((entry) => (
+              <li class:list={[`vx-toc-depth-${entry.depth}`]}>
+                <a href={`#${entry.slug}`}>{entry.text}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </aside>
+    )}
+
+    <article class="vx-doc-content">
+      <header class="vx-doc-header">
+        <h1>{title}</h1>
+        {description && <p class="vx-doc-lede">{description}</p>}
+      </header>
+      <slot />
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .vx-doc {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    padding-top: 3rem;
+  }
+
+  @media (min-width: 1024px) {
+    .vx-doc {
+      grid-template-columns: 220px minmax(0, 720px);
+      align-items: start;
+    }
+  }
+
+  .vx-doc-toc {
+    position: sticky;
+    top: 96px;
+    align-self: start;
+    font-size: 0.88rem;
+    color: var(--vx-text-secondary);
+    border-left: 1px solid var(--vx-border-subtle);
+    padding-left: 1rem;
+    display: none;
+  }
+  @media (min-width: 1024px) {
+    .vx-doc-toc {
+      display: block;
+    }
+  }
+  .vx-doc-toc-heading {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.72rem;
+    color: var(--vx-text-tertiary);
+    margin-bottom: 0.85rem;
+  }
+  .vx-doc-toc ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .vx-doc-toc a {
+    color: var(--vx-text-secondary);
+    transition: color 150ms ease;
+  }
+  .vx-doc-toc a:hover {
+    color: var(--vx-text-primary);
+  }
+  .vx-toc-depth-3 { padding-left: 0.75rem; font-size: 0.82rem; }
+  .vx-toc-depth-4 { padding-left: 1.5rem; font-size: 0.8rem; }
+
+  .vx-doc-content {
+    max-width: 720px;
+    width: 100%;
+  }
+
+  .vx-doc-header {
+    margin-bottom: 2rem;
+  }
+
+  .vx-doc-lede {
+    margin-top: 0.85rem;
+    color: var(--vx-text-secondary);
+    font-size: 1.1rem;
+    max-width: 60ch;
+  }
+</style>

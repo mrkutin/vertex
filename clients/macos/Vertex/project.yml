@@ -1,0 +1,86 @@
+name: Vertex
+options:
+  bundleIdPrefix: ru.vertices
+  deploymentTarget:
+    macOS: "14.0"
+  xcodeVersion: "16.0"
+  groupSortPosition: top
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: J698685529
+    ENABLE_HARDENED_RUNTIME: YES
+
+packages:
+  VertexCore:
+    path: ../../shared/VertexCore
+
+schemes:
+  Vertex:
+    build:
+      targets:
+        Vertex: all
+        VertexTunnel: all
+    run:
+      config: Debug
+      executable: Vertex
+    archive:
+      config: Release
+
+targets:
+  Vertex:
+    type: application
+    platform: macOS
+    sources:
+      - path: App
+    dependencies:
+      - target: VertexTunnel
+        embed: true
+        codeSign: true
+      - package: VertexCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: ru.vertices
+        CODE_SIGN_ENTITLEMENTS: App/Vertex.entitlements
+        INFOPLIST_FILE: App/Info.plist
+        PRODUCT_NAME: Vertex
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        MARKETING_VERSION: "2.11.1"
+        CURRENT_PROJECT_VERSION: "11"
+        COMBINE_HIDPI_IMAGES: YES
+        LD_RUNPATH_SEARCH_PATHS:
+          - "$(inherited)"
+          - "@executable_path/../Frameworks"
+          - "@executable_path/../PlugIns"
+
+  VertexTunnel:
+    type: app-extension
+    platform: macOS
+    sources:
+      - path: Tunnel
+    dependencies:
+      - package: VertexCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: ru.vertices.tunnel
+        CODE_SIGN_ENTITLEMENTS: Tunnel/Tunnel.entitlements
+        INFOPLIST_FILE: Tunnel/Info.plist
+        PRODUCT_NAME: VertexTunnel
+        SWIFT_VERSION: "5.9"
+        MARKETING_VERSION: "2.11.1"
+        CURRENT_PROJECT_VERSION: "11"
+        # Hardened Runtime отключён для extension'а — на iOS его нет,
+        # а на macOS вместе с App Sandbox ломает TLS verify в Network.framework
+        # (NWError -9808 errSSLBadCert при коннекте к рабочим Let's Encrypt
+        # сертификатам брокеров). Apple требует Hardened Runtime только для
+        # notarization App Store; для дев-сборок ок.
+        ENABLE_HARDENED_RUNTIME: NO
+        LD_RUNPATH_SEARCH_PATHS:
+          - "$(inherited)"
+          - "@executable_path/../Frameworks"
+          - "@executable_path/../../../../Frameworks"

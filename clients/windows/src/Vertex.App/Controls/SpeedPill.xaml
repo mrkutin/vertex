@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="Vertex.App.Controls.SpeedPill"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Border x:Name="Capsule"
+            Background="{StaticResource BgSurfaceElevBrush}"
+            BorderBrush="{StaticResource BorderSubtleBrush}"
+            BorderThickness="0.5"
+            CornerRadius="14"
+            Padding="14,7"
+            HorizontalAlignment="Center">
+        <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+
+            <!-- Upload — Unicode ↑ in the regular UI font. Earlier draft used
+                 Segoe MDL2 E74A which is "Download" (down-arrow tray); E74B
+                 is "DownloadMap". Both rendered as down-icons making the
+                 columns visually identical. Plain Unicode arrows match the
+                 macOS arrow.up/down weight + glyph semantics exactly. -->
+            <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                <TextBlock Text="↑"
+                           FontSize="13"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource AccentPrimaryBrush}"
+                           VerticalAlignment="Center"/>
+                <TextBlock x:Name="UpText"
+                           Text="—"
+                           FontFamily="Consolas"
+                           FontSize="13"
+                           Foreground="{StaticResource TextPrimaryBrush}"/>
+            </StackPanel>
+
+            <Border Width="0.5" Height="12"
+                    Background="{StaticResource BorderSubtleBrush}"/>
+
+            <!-- Download -->
+            <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                <TextBlock Text="↓"
+                           FontSize="13"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource AccentPrimaryBrush}"
+                           VerticalAlignment="Center"/>
+                <TextBlock x:Name="DownText"
+                           Text="—"
+                           FontFamily="Consolas"
+                           FontSize="13"
+                           Foreground="{StaticResource TextPrimaryBrush}"/>
+            </StackPanel>
+
+            <Border Width="0.5" Height="12"
+                    Background="{StaticResource BorderSubtleBrush}"/>
+
+            <!-- Ping — E823 is Stopwatch, matches macOS `timer`. -->
+            <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                <FontIcon x:Name="PingIcon"
+                          Glyph="&#xE823;"
+                          FontSize="11"
+                          Foreground="{StaticResource TextTertiaryBrush}"/>
+                <TextBlock x:Name="PingText"
+                           Text="—"
+                           FontFamily="Consolas"
+                           FontSize="13"
+                           Foreground="{StaticResource TextPrimaryBrush}"/>
+            </StackPanel>
+
+        </StackPanel>
+    </Border>
+</UserControl>

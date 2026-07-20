@@ -1,0 +1,248 @@
+---
+import Icon from './Icon.astro';
+import ThemeToggle from './ThemeToggle.astro';
+import LangToggle from './LangToggle.astro';
+import { getLangFromUrl, useTranslations, useTranslatedPath } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const path = useTranslatedPath(lang);
+
+const links = [
+  { href: path('/features'), label: t('nav.features') },
+  { href: path('/download'), label: t('nav.download') },
+  { href: path('/support'), label: t('nav.support') },
+];
+---
+
+<header class="vx-header" data-vx-header>
+  <a href="#main" class="vx-skip-link">{t('a11y.skipToContent')}</a>
+
+  <div class="vx-header-inner vx-container">
+    <a href={path('/')} class="vx-brand" aria-label="Vertex — home">
+      <span class="vx-brand-dot" aria-hidden="true"></span>
+      <span class="vx-wordmark vx-brand-text">VERTEX</span>
+    </a>
+
+    <nav class="vx-nav" aria-label="Primary">
+      <ul role="list">
+        {links.map((link) => (
+          <li>
+            <a href={link.href} class="vx-nav-link">{link.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="vx-header-actions">
+      <ThemeToggle />
+      <LangToggle />
+      <button
+        type="button"
+        class="vx-burger"
+        data-vx-burger
+        aria-label={t('a11y.openMenu')}
+        aria-expanded="false"
+        aria-controls="vx-mobile-nav"
+      >
+        <Icon name="menu" size={20} />
+      </button>
+    </div>
+  </div>
+
+  <div
+    id="vx-mobile-nav"
+    class="vx-mobile-nav"
+    data-vx-mobile-nav
+    aria-hidden="true"
+    inert
+  >
+    <ul role="list">
+      {links.map((link) => (
+        <li><a href={link.href}>{link.label}</a></li>
+      ))}
+    </ul>
+  </div>
+</header>
+
+<style>
+  .vx-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--vx-bg-surface-elev);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    backdrop-filter: blur(18px) saturate(140%);
+    border-bottom: 1px solid var(--vx-border-subtle);
+  }
+
+  .vx-skip-link {
+    position: absolute;
+    left: 0.5rem;
+    top: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--vx-bg-surface);
+    color: var(--vx-text-primary);
+    border-radius: var(--vx-radius-sm);
+    transform: translateY(-150%);
+    transition: transform 150ms ease;
+    z-index: 100;
+  }
+  .vx-skip-link:focus {
+    transform: translateY(0);
+  }
+
+  .vx-header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    height: 64px;
+  }
+
+  .vx-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    color: var(--vx-text-primary);
+    transition: opacity 150ms ease;
+  }
+  .vx-brand:hover {
+    opacity: 0.85;
+  }
+
+  .vx-brand-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--vx-accent);
+    box-shadow: 0 0 12px var(--vx-glow-primary);
+  }
+
+  .vx-brand-text {
+    color: var(--vx-text-primary);
+    font-size: 0.95rem;
+  }
+
+  .vx-nav {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .vx-nav {
+      display: block;
+      flex: 1;
+    }
+    .vx-nav ul {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      list-style: none;
+    }
+  }
+
+  .vx-nav-link {
+    color: var(--vx-text-secondary);
+    font-size: 0.92rem;
+    font-weight: 500;
+    transition: color 150ms ease;
+  }
+  .vx-nav-link:hover,
+  .vx-nav-link:focus-visible {
+    color: var(--vx-text-primary);
+  }
+
+  .vx-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .vx-burger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    color: var(--vx-text-secondary);
+    border: 1px solid var(--vx-border-subtle);
+  }
+  @media (min-width: 768px) {
+    .vx-burger {
+      display: none;
+    }
+  }
+
+  .vx-mobile-nav {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 240ms ease;
+    border-top: 1px solid transparent;
+  }
+  .vx-mobile-nav[data-open='true'] {
+    max-height: 320px;
+    border-top-color: var(--vx-border-subtle);
+  }
+  .vx-mobile-nav ul {
+    list-style: none;
+    padding: 0.75rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .vx-mobile-nav li a {
+    display: block;
+    padding: 0.7rem 0.5rem;
+    color: var(--vx-text-secondary);
+    border-radius: var(--vx-radius-sm);
+    transition: color 150ms ease, background 150ms ease;
+  }
+  .vx-mobile-nav li a:hover {
+    color: var(--vx-text-primary);
+    background: var(--vx-bg-surface-muted);
+  }
+  @media (min-width: 768px) {
+    .vx-mobile-nav {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  (() => {
+    const burger = document.querySelector<HTMLButtonElement>('[data-vx-burger]');
+    const panel = document.querySelector<HTMLElement>('[data-vx-mobile-nav]');
+    if (!burger || !panel) return;
+
+    function setOpen(next: boolean) {
+      panel!.dataset.open = String(next);
+      panel!.setAttribute('aria-hidden', String(!next));
+      burger!.setAttribute('aria-expanded', String(next));
+      if (next) {
+        panel!.removeAttribute('inert');
+      } else {
+        panel!.setAttribute('inert', '');
+      }
+    }
+
+    burger.addEventListener('click', () => {
+      const open = panel.dataset.open === 'true';
+      setOpen(!open);
+    });
+
+    // Force-close on resize past the desktop breakpoint.
+    const mq = window.matchMedia('(min-width: 768px)');
+    const onChange = () => {
+      if (mq.matches && panel.dataset.open === 'true') {
+        setOpen(false);
+      }
+    };
+    if (typeof mq.addEventListener === 'function') {
+      mq.addEventListener('change', onChange);
+    } else {
+      // Safari < 14
+      mq.addListener(onChange);
+    }
+  })();
+</script>

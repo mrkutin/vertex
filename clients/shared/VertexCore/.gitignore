@@ -1,0 +1,10 @@
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# Xcode build artefacts (created when this package is built directly)
+build/
+DerivedData/
+
+# macOS
+.DS_Store

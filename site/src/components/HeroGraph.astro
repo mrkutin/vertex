@@ -1,0 +1,327 @@
+---
+/**
+ * Living Vertex — central node + satellite nodes, edges between them, packets
+ * (sparks) traveling along the edges. SVG inline, animations driven by RAF for
+ * cross-browser packet motion. Static breath via CSS keyframes.
+ *
+ * a11y: role="img" + title + desc, decorative caption is a separate <p>.
+ * Honors prefers-reduced-motion: stops sparks and breath animation.
+ */
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Center + 6 satellite positions in viewBox 800x600.
+const CENTER = { x: 400, y: 300 };
+const SATELLITES = [
+  { x: 120, y: 120 },
+  { x: 680, y: 130 },
+  { x: 90, y: 460 },
+  { x: 700, y: 470 },
+  { x: 400, y: 60 },
+  { x: 400, y: 540 },
+];
+---
+
+<figure class="vx-hero-graph" aria-hidden="false">
+  <svg
+    viewBox="0 0 800 600"
+    role="img"
+    aria-labelledby="vx-hero-title vx-hero-desc"
+    preserveAspectRatio="xMidYMid meet"
+    data-vx-hero-svg
+  >
+    <title id="vx-hero-title">{t('hero.graph.title')}</title>
+    <desc id="vx-hero-desc">{t('hero.graph.desc')}</desc>
+
+    <defs>
+      <radialGradient id="vx-halo" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="var(--vx-accent)" stop-opacity="0.55" />
+        <stop offset="60%" stop-color="var(--vx-accent)" stop-opacity="0.12" />
+        <stop offset="100%" stop-color="var(--vx-accent)" stop-opacity="0" />
+      </radialGradient>
+      <radialGradient id="vx-core" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#FFFFFF" stop-opacity="1" />
+        <stop offset="40%" stop-color="var(--vx-accent)" stop-opacity="0.85" />
+        <stop offset="100%" stop-color="var(--vx-accent)" stop-opacity="0" />
+      </radialGradient>
+      <radialGradient id="vx-sat-glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#FFFFFF" stop-opacity="1" />
+        <stop offset="35%" stop-color="var(--vx-accent)" stop-opacity="0.85" />
+        <stop offset="100%" stop-color="var(--vx-accent)" stop-opacity="0" />
+      </radialGradient>
+      <radialGradient id="vx-sat-halo" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="var(--vx-accent)" stop-opacity="0.45" />
+        <stop offset="60%" stop-color="var(--vx-accent)" stop-opacity="0.1" />
+        <stop offset="100%" stop-color="var(--vx-accent)" stop-opacity="0" />
+      </radialGradient>
+    </defs>
+
+    {/* Halo */}
+    <ellipse
+      cx={CENTER.x}
+      cy={CENTER.y}
+      rx="180"
+      ry="150"
+      fill="url(#vx-halo)"
+      class="vx-halo"
+    />
+
+    {/* Edges */}
+    <g class="vx-edges" stroke="var(--vx-border-strong)" stroke-width="1.25" fill="none" stroke-linecap="round">
+      {SATELLITES.map((s, i) => (
+        <line
+          x1={CENTER.x}
+          y1={CENTER.y}
+          x2={s.x}
+          y2={s.y}
+          data-edge={i}
+          opacity="0.55"
+        />
+      ))}
+    </g>
+
+    {/* Satellite halos (kicked by JS on impact) */}
+    <g class="vx-sat-halos">
+      {SATELLITES.map((s, i) => (
+        <ellipse cx={s.x} cy={s.y} rx="80" ry="70" fill="url(#vx-sat-halo)" class="vx-sat-halo" data-sat-index={i} />
+      ))}
+    </g>
+
+    {/* Satellite glows (radial accent gradient under core) */}
+    <g class="vx-sat-glows">
+      {SATELLITES.map((s, i) => (
+        <circle cx={s.x} cy={s.y} r="28" fill="url(#vx-sat-glow)" class="vx-sat-glow" data-sat-index={i} />
+      ))}
+    </g>
+
+    {/* Satellite cores (solid centers) */}
+    <g class="vx-satellites">
+      {SATELLITES.map((s, i) => (
+        <circle cx={s.x} cy={s.y} r="9" fill="#FFFFFF" class="vx-sat" data-sat-index={i} />
+      ))}
+    </g>
+
+    {/* Sparks layer (added by JS via <circle>) */}
+    <g class="vx-sparks" data-sparks></g>
+
+    {/* Central node — glow + solid white core */}
+    <circle cx={CENTER.x} cy={CENTER.y} r="60" fill="url(#vx-core)" class="vx-core-glow" />
+    <circle cx={CENTER.x} cy={CENTER.y} r="22" fill="#FFFFFF" class="vx-core" />
+  </svg>
+
+  <figcaption class="vx-hero-caption">{t('hero.graph.caption')}</figcaption>
+</figure>
+
+<style>
+  .vx-hero-graph {
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    aspect-ratio: 4 / 3;
+    position: relative;
+  }
+
+  .vx-hero-graph svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .vx-core,
+  .vx-core-glow,
+  .vx-halo,
+  .vx-sat,
+  .vx-sat-glow,
+  .vx-sat-halo {
+    transform-origin: 50% 50%;
+    transform-box: fill-box;
+    will-change: transform, opacity;
+  }
+
+  .vx-hero-caption {
+    margin-top: 0.75rem;
+    text-align: center;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    color: var(--vx-text-tertiary);
+  }
+
+</style>
+
+<script>
+  (() => {
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) return;
+
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+    const center = { x: 400, y: 300 };
+    const sats: Array<{ x: number; y: number }> = [
+      { x: 120, y: 120 },
+      { x: 680, y: 130 },
+      { x: 90, y: 460 },
+      { x: 700, y: 470 },
+      { x: 400, y: 60 },
+      { x: 400, y: 540 },
+    ];
+
+    document.querySelectorAll<SVGGElement>('[data-sparks]').forEach((layer) => {
+      const root = layer.closest<SVGSVGElement>('[data-vx-hero-svg]');
+      if (!root) return;
+
+      type Spark = {
+        el: SVGCircleElement;
+        from: { x: number; y: number };
+        to: { x: number; y: number };
+        start: number;
+        duration: number;
+        targetSatIndex: number; // -1 if target is the center
+      };
+
+      const sparks: Spark[] = [];
+      const MAX_CONCURRENT = 12; // up to 2 per edge with 6 edges
+
+      // Physics-driven impact pulses: each hit "kicks" the node's scale toward
+      // a peak; between hits it decays back to 1. Frequent hits keep nodes
+      // visually inflated; sparse hits let them settle.
+      type Pulse = { el: Element | null; scale: number; peak: number; releasePerSec: number; baseOpacity: number; opacityPeak: number; opacity: number };
+
+      const coreEl = root.querySelector<SVGCircleElement>('.vx-core');
+      const coreGlowEl = root.querySelector<SVGCircleElement>('.vx-core-glow');
+      const haloEl = root.querySelector<SVGEllipseElement>('.vx-halo');
+      const satEls = Array.from(root.querySelectorAll<SVGCircleElement>('.vx-sat'));
+      const satGlowEls = Array.from(root.querySelectorAll<SVGCircleElement>('.vx-sat-glow'));
+      const satHaloEls = Array.from(root.querySelectorAll<SVGEllipseElement>('.vx-sat-halo'));
+
+      const corePulse:     Pulse = { el: coreEl,     scale: 1, peak: 1.35, releasePerSec: 2.4, baseOpacity: 1,    opacityPeak: 1,   opacity: 1 };
+      const coreGlowPulse: Pulse = { el: coreGlowEl, scale: 1, peak: 1.5,  releasePerSec: 1.8, baseOpacity: 0.55, opacityPeak: 1,   opacity: 0.55 };
+      const haloPulse:     Pulse = { el: haloEl,     scale: 1, peak: 1.18, releasePerSec: 1.5, baseOpacity: 0.7,  opacityPeak: 1,   opacity: 0.7 };
+
+      // Each satellite gets 3 pulses (core / glow / halo) mirroring the center.
+      type SatPulseTrio = { core: Pulse; glow: Pulse; halo: Pulse };
+      const satPulses: SatPulseTrio[] = satEls.map((coreSatEl, i) => ({
+        core: { el: coreSatEl,         scale: 1, peak: 1.4,  releasePerSec: 2.6, baseOpacity: 1,    opacityPeak: 1, opacity: 1 },
+        glow: { el: satGlowEls[i] ?? null, scale: 1, peak: 1.5,  releasePerSec: 2.0, baseOpacity: 0.0,  opacityPeak: 1, opacity: 0 },
+        halo: { el: satHaloEls[i] ?? null, scale: 1, peak: 1.18, releasePerSec: 1.6, baseOpacity: 0.0,  opacityPeak: 1, opacity: 0 },
+      }));
+
+      function applyPulse(p: Pulse) {
+        if (!p.el) return;
+        (p.el as SVGElement).style.transform = `scale(${p.scale})`;
+        (p.el as SVGElement).style.opacity = String(p.opacity);
+      }
+
+      function decayPulse(p: Pulse, dt: number) {
+        if (p.scale > 1) {
+          p.scale = Math.max(1, p.scale - p.releasePerSec * dt);
+        }
+        if (p.opacity > p.baseOpacity) {
+          p.opacity = Math.max(p.baseOpacity, p.opacity - p.releasePerSec * dt * (p.opacityPeak - p.baseOpacity));
+        }
+        applyPulse(p);
+      }
+
+      function kick(p: Pulse) {
+        // Snap to peak (max with current — overlapping hits hold inflation).
+        p.scale = Math.max(p.scale, p.peak);
+        p.opacity = p.opacityPeak;
+        applyPulse(p);
+      }
+
+      function pulseTarget(satIndex: number) {
+        if (satIndex === -1) {
+          kick(corePulse);
+          kick(coreGlowPulse);
+          kick(haloPulse);
+        } else {
+          const trio = satPulses[satIndex];
+          if (trio) {
+            kick(trio.core);
+            kick(trio.glow);
+            kick(trio.halo);
+          }
+        }
+      }
+
+      function spawn(now: number) {
+        // Random satellite + random direction (inbound or outbound).
+        const satIdx = Math.floor(Math.random() * sats.length);
+        const sat = sats[satIdx]!;
+        const inbound = Math.random() < 0.5;
+        const from = inbound ? sat : center;
+        const to = inbound ? center : sat;
+        const targetSatIndex = inbound ? -1 : satIdx;
+
+        const el = document.createElementNS(SVG_NS, 'circle');
+        el.setAttribute('r', '5');
+        el.setAttribute('fill', 'var(--vx-accent)');
+        el.setAttribute('cx', String(from.x));
+        el.setAttribute('cy', String(from.y));
+        el.style.filter = 'drop-shadow(0 0 8px var(--vx-glow-primary))';
+        layer.appendChild(el);
+
+        sparks.push({
+          el,
+          from,
+          to,
+          start: now,
+          duration: 700 + Math.random() * 300,
+          targetSatIndex,
+        });
+      }
+
+      let lastSpawn = 0;
+      let nextDelay = 80 + Math.random() * 140;
+      let lastFrame = 0;
+
+      function frame(now: number) {
+        const dt = lastFrame ? Math.min(0.05, (now - lastFrame) / 1000) : 0.016;
+        lastFrame = now;
+
+        // Decay all pulses toward rest.
+        decayPulse(corePulse, dt);
+        decayPulse(coreGlowPulse, dt);
+        decayPulse(haloPulse, dt);
+        for (const trio of satPulses) {
+          decayPulse(trio.core, dt);
+          decayPulse(trio.glow, dt);
+          decayPulse(trio.halo, dt);
+        }
+
+        if (now - lastSpawn > nextDelay && sparks.length < MAX_CONCURRENT) {
+          // Sometimes spawn a small burst (2-3 simultaneously) for richer flow.
+          const burst = Math.random() < 0.35 ? 2 + (Math.random() < 0.5 ? 1 : 0) : 1;
+          for (let b = 0; b < burst && sparks.length < MAX_CONCURRENT; b++) {
+            spawn(now);
+          }
+          lastSpawn = now;
+          nextDelay = 180 + Math.random() * 360;
+        }
+
+        for (let i = sparks.length - 1; i >= 0; i--) {
+          const s = sparks[i]!;
+          const tProgress = (now - s.start) / s.duration;
+          if (tProgress >= 1) {
+            s.el.remove();
+            sparks.splice(i, 1);
+            pulseTarget(s.targetSatIndex);
+            continue;
+          }
+          const x = s.from.x + (s.to.x - s.from.x) * tProgress;
+          const y = s.from.y + (s.to.y - s.from.y) * tProgress;
+          // Fade out near the end for a smoother arrival.
+          const opacity = tProgress < 0.85 ? 1 : 1 - (tProgress - 0.85) / 0.15;
+          s.el.setAttribute('cx', String(x));
+          s.el.setAttribute('cy', String(y));
+          s.el.setAttribute('opacity', String(opacity));
+        }
+
+        requestAnimationFrame(frame);
+      }
+
+      requestAnimationFrame(frame);
+    });
+  })();
+</script>

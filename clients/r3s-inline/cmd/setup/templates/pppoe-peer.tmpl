@@ -1,0 +1,24 @@
+# pppd peer for Vertex R3S-inline WAN PPPoE.
+# Rendered by vtx-inline-setup (bootstrap web-UI) into /etc/ppp/peers/vtx-isp
+# with {{.PPPoEUser}} substituted. Password goes into /etc/ppp/chap-secrets
+# (separate file, chmod 600 root:root).
+
+plugin rp-pppoe.so eth0
+user "{{.PPPoEUser}}"
+ifname pppoe0
+noipdefault
+defaultroute
+replacedefaultroute
+hide-password
+# noauth: don't require ISP to authenticate to us. PAP/CHAP is one-way —
+# we authenticate to the ISP via /etc/ppp/chap-secrets, not the reverse.
+noauth
+persist
+maxfail 0
+holdoff 5
+# pppd does NOT pull DNS from peer — R3S is DNS-neutral.
+# (omitting `usepeerdns` is the way: omission = ignore peer DNS.)
+mtu 1492
+mru 1492
+lcp-echo-interval 20
+lcp-echo-failure 3

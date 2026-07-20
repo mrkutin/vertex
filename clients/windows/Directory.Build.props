@@ -1,0 +1,39 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsNotAsErrors>NU1903</WarningsNotAsErrors>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <!-- SemVer bumped on every build per project rule. -->
+    <VersionPrefix>0.1.5</VersionPrefix>
+    <Authors>Vertex</Authors>
+    <Company>Vertex</Company>
+    <Product>Vertex VPN</Product>
+    <Copyright>© Vertex</Copyright>
+
+    <!-- Default platforms. WinUI/Service projects override TFM. -->
+    <Platforms>x64;ARM64</Platforms>
+
+    <!--
+      .NET 8 turned off the legacy RID graph by default. Re-enable so that
+      `runtimes/<rid>/native/*.dll` for transitive native deps (libsodium)
+      gets resolved by the runtime native loader without us having to copy
+      it next to the assembly. (The asset is already in `runtimes/win-arm64/native/`
+      via NSec's NuGet pack.)
+    -->
+    <UseRidGraph>true</UseRidGraph>
+
+    <!-- Reproducible builds. -->
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+</Project>

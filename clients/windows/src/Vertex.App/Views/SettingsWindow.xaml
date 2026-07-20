@@ -1,0 +1,532 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="Vertex.App.Views.SettingsWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Vertex Settings">
+
+    <Grid Background="{StaticResource BgCanvasBrush}" RequestedTheme="Dark">
+        <Grid.Resources>
+            <!-- WinUI 3 default Pivot header uses TextFillColorPrimary —
+                 which on dark themes resolves to ~#E6FFFFFF, but our
+                 BgCanvas (#080F26) plus the system's "subtle" treatment
+                 for non-selected tabs leaves them near-invisible. Force
+                 the header brushes to our explicit theme tokens. -->
+            <SolidColorBrush x:Key="PivotHeaderItemForegroundUnselected" Color="#C7C4D2EE"/>
+            <SolidColorBrush x:Key="PivotHeaderItemForegroundUnselectedPointerOver" Color="#FFFFFFFF"/>
+            <SolidColorBrush x:Key="PivotHeaderItemForegroundUnselectedPressed" Color="#FFFFFFFF"/>
+            <SolidColorBrush x:Key="PivotHeaderItemForegroundSelected" Color="#FFFFFFFF"/>
+            <SolidColorBrush x:Key="PivotHeaderItemForegroundSelectedPointerOver" Color="#FFFFFFFF"/>
+            <SolidColorBrush x:Key="PivotHeaderItemForegroundSelectedPressed" Color="#FFFFFFFF"/>
+            <SolidColorBrush x:Key="PivotHeaderItemForegroundDisabled" Color="#998497C2"/>
+            <SolidColorBrush x:Key="PivotHeaderItemBackgroundUnselected" Color="Transparent"/>
+            <SolidColorBrush x:Key="PivotHeaderItemBackgroundUnselectedPointerOver" Color="#1AFFFFFF"/>
+            <SolidColorBrush x:Key="PivotHeaderItemBackgroundSelected" Color="Transparent"/>
+            <SolidColorBrush x:Key="PivotHeaderItemBackgroundSelectedPointerOver" Color="#1AFFFFFF"/>
+            <SolidColorBrush x:Key="PivotHeaderItemBackgroundSelectedPressed" Color="#33FFFFFF"/>
+            <SolidColorBrush x:Key="PivotHeaderItemBackgroundUnselectedPressed" Color="#33FFFFFF"/>
+            <!-- WinUI 3 also uses the alternative name "PivotItemHeader*" in
+                 some template variants — duplicate the overrides under both
+                 keys so we hit the right one regardless of template path. -->
+            <SolidColorBrush x:Key="PivotItemHeaderBackgroundUnselected" Color="Transparent"/>
+            <SolidColorBrush x:Key="PivotItemHeaderBackgroundUnselectedPointerOver" Color="#1AFFFFFF"/>
+            <SolidColorBrush x:Key="PivotItemHeaderBackgroundSelected" Color="Transparent"/>
+            <SolidColorBrush x:Key="PivotItemHeaderBackgroundSelectedPointerOver" Color="#1AFFFFFF"/>
+            <SolidColorBrush x:Key="PivotItemHeaderBackgroundSelectedPressed" Color="#33FFFFFF"/>
+            <!-- Default Pivot header is 24 epx; macOS Settings tabs read
+                 ~14pt. Match Mac scale + weight. -->
+            <x:Double x:Key="PivotHeaderItemFontSize">14</x:Double>
+
+            <!-- TextBox / PasswordBox use TextControlForeground ThemeResource,
+                 not the local Foreground property. Without these overrides
+                 the input text renders in light-theme black even when the
+                 surrounding theme is Dark. -->
+            <SolidColorBrush x:Key="TextControlForeground"            Color="#FFFFFFFF"/>
+            <SolidColorBrush x:Key="TextControlForegroundPointerOver" Color="#FFFFFFFF"/>
+            <SolidColorBrush x:Key="TextControlForegroundFocused"     Color="#FFFFFFFF"/>
+            <SolidColorBrush x:Key="TextControlForegroundDisabled"    Color="#998497C2"/>
+            <SolidColorBrush x:Key="TextControlBackground"            Color="Transparent"/>
+            <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#1AFFFFFF"/>
+            <SolidColorBrush x:Key="TextControlBackgroundFocused"     Color="#1AFFFFFF"/>
+            <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="#998497C2"/>
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundPointerOver" Color="#998497C2"/>
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused"     Color="#998497C2"/>
+            <SolidColorBrush x:Key="TextControlBorderBrush"           Color="Transparent"/>
+            <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="Transparent"/>
+            <SolidColorBrush x:Key="TextControlBorderBrushFocused"    Color="Transparent"/>
+        </Grid.Resources>
+        <Pivot x:Name="Tabs" HorizontalAlignment="Center">
+            <!-- macOS Settings tabs are icon+label compact tabs centered in
+                 the title strip. WinUI 3 Pivot defaults to large 24pt
+                 left-aligned text; we override per-PivotItem.Header with
+                 a StackPanel of FontIcon + TextBlock at 14pt to match. -->
+
+            <!-- Identity -->
+            <PivotItem>
+                <PivotItem.Header>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <FontIcon Glyph="&#xE77B;" FontSize="14"/>
+                        <TextBlock Text="Identity" FontSize="14"/>
+                    </StackPanel>
+                </PivotItem.Header>
+                <ScrollViewer>
+                    <StackPanel Spacing="20" Padding="20">
+                        <TextBlock Text="Username is exit-independent: vtx-client-{name}. Password is stored under DPAPI LocalMachine in %ProgramData%\Vertex\password.bin."
+                                   Foreground="{StaticResource TextTertiaryBrush}"
+                                   FontSize="12"
+                                   TextWrapping="Wrap"/>
+
+                        <Border Background="{StaticResource BgSurfaceBrush}"
+                                BorderBrush="{StaticResource BorderSubtleBrush}"
+                                BorderThickness="0.5"
+                                CornerRadius="{StaticResource Vx_r_lg}"
+                                Padding="16">
+                            <StackPanel Spacing="12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0"
+                                               Text="Client name"
+                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,12,0"/>
+                                    <TextBox x:Name="ClientNameInput"
+                                             Grid.Column="1"
+                                             PlaceholderText="windows"
+                                             FontSize="14"
+                                             TextAlignment="Right"
+                                             VerticalAlignment="Center"
+                                             Background="Transparent"
+                                             BorderThickness="0"
+                                             MaxLength="32"
+                                             KeyDown="OnClientNameKeyDown"/>
+                                    <Button Grid.Column="2"
+                                            Click="OnSaveClientNameClick"
+                                            Content="Save"
+                                            Foreground="{StaticResource AccentPrimaryBrush}"
+                                            Background="Transparent"
+                                            BorderThickness="0"/>
+                                </Grid>
+                                <Border Background="{StaticResource BorderSubtleBrush}" Height="0.5"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0"
+                                               Text="Password"
+                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,12,0"/>
+                                    <PasswordBox x:Name="PasswordInput"
+                                                 Grid.Column="1"
+                                                 PlaceholderText="password"
+                                                 PasswordRevealMode="Peek"
+                                                 Background="Transparent"
+                                                 BorderThickness="0">
+                                        <PasswordBox.Resources>
+                                            <ResourceDictionary>
+                                                <ResourceDictionary.ThemeDictionaries>
+                                                    <ResourceDictionary x:Key="Default">
+                                                        <SolidColorBrush x:Key="TextControlForeground"            Color="#FFFFFFFF"/>
+                                                        <SolidColorBrush x:Key="TextControlForegroundPointerOver" Color="#FFFFFFFF"/>
+                                                        <SolidColorBrush x:Key="TextControlForegroundFocused"     Color="#FFFFFFFF"/>
+                                                        <SolidColorBrush x:Key="TextControlBackground"            Color="Transparent"/>
+                                                        <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#1AFFFFFF"/>
+                                                        <SolidColorBrush x:Key="TextControlBackgroundFocused"     Color="#1AFFFFFF"/>
+                                                        <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="#998497C2"/>
+                                                        <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="#998497C2"/>
+                                                        <SolidColorBrush x:Key="TextControlBorderBrush"           Color="Transparent"/>
+                                                        <SolidColorBrush x:Key="TextControlBorderBrushFocused"    Color="Transparent"/>
+                                                    </ResourceDictionary>
+                                                    <ResourceDictionary x:Key="Light">
+                                                        <SolidColorBrush x:Key="TextControlForeground"            Color="#FFFFFFFF"/>
+                                                        <SolidColorBrush x:Key="TextControlForegroundPointerOver" Color="#FFFFFFFF"/>
+                                                        <SolidColorBrush x:Key="TextControlForegroundFocused"     Color="#FFFFFFFF"/>
+                                                        <SolidColorBrush x:Key="TextControlBackground"            Color="Transparent"/>
+                                                        <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#1AFFFFFF"/>
+                                                        <SolidColorBrush x:Key="TextControlBackgroundFocused"     Color="#1AFFFFFF"/>
+                                                        <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="#998497C2"/>
+                                                        <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="#998497C2"/>
+                                                        <SolidColorBrush x:Key="TextControlBorderBrush"           Color="Transparent"/>
+                                                        <SolidColorBrush x:Key="TextControlBorderBrushFocused"    Color="Transparent"/>
+                                                    </ResourceDictionary>
+                                                </ResourceDictionary.ThemeDictionaries>
+                                            </ResourceDictionary>
+                                        </PasswordBox.Resources>
+                                    </PasswordBox>
+                                    <Button Grid.Column="2"
+                                            Click="OnSavePasswordClick"
+                                            Content="Save"
+                                            Foreground="{StaticResource AccentPrimaryBrush}"
+                                            Background="Transparent"
+                                            BorderThickness="0"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Public Identity fingerprint — paritет macOS
+                             SettingsScreen.swift:330-365. Fingerprint = first
+                             16 hex chars formatted as 4 groups of 4. Reveal
+                             expands to the full 64-char public key; Copy
+                             puts the full hex on the clipboard for admin
+                             reset on the edge. -->
+                        <Border Background="{StaticResource BgSurfaceBrush}"
+                                BorderBrush="{StaticResource BorderSubtleBrush}"
+                                BorderThickness="0.5"
+                                CornerRadius="{StaticResource Vx_r_lg}"
+                                Padding="16">
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="Public Identity"
+                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                           FontSize="13"
+                                           FontWeight="SemiBold"/>
+                                <Grid x:Name="FingerprintRow">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock x:Name="FingerprintText"
+                                               Grid.Column="0"
+                                               Text="—"
+                                               Foreground="{StaticResource TextPrimaryBrush}"
+                                               FontFamily="Consolas"
+                                               FontSize="14"
+                                               IsTextSelectionEnabled="True"
+                                               VerticalAlignment="Center"/>
+                                    <Button x:Name="ToggleRevealButton"
+                                            Grid.Column="1"
+                                            Click="OnToggleRevealFingerprint"
+                                            Content="Reveal"
+                                            Foreground="{StaticResource AccentPrimaryBrush}"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            Margin="8,0,0,0"/>
+                                    <Button x:Name="CopyFingerprintButton"
+                                            Grid.Column="2"
+                                            Click="OnCopyFingerprintClick"
+                                            Content="Copy"
+                                            Foreground="{StaticResource AccentPrimaryBrush}"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            Margin="4,0,0,0"/>
+                                </Grid>
+                                <Border x:Name="FullPubkeyBox"
+                                        Visibility="Collapsed"
+                                        Background="{StaticResource BgSurfaceMutedBrush}"
+                                        CornerRadius="{StaticResource Vx_r_md}"
+                                        Padding="12">
+                                    <ScrollViewer HorizontalScrollMode="Auto"
+                                                  HorizontalScrollBarVisibility="Auto"
+                                                  VerticalScrollMode="Disabled">
+                                        <TextBlock x:Name="FullPubkeyText"
+                                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                                   FontFamily="Consolas"
+                                                   FontSize="12"
+                                                   IsTextSelectionEnabled="True"/>
+                                    </ScrollViewer>
+                                </Border>
+                                <TextBlock Text="This device's permanent identity in the Vertex graph. Stored under DPAPI in %ProgramData%\Vertex\identity.bin — never leaves this device. Copy the full key for admin reset on the edge. Reconnect required for a freshly reset identity to take effect."
+                                           Foreground="{StaticResource TextTertiaryBrush}"
+                                           FontSize="12"
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Button Click="OnResetIdentityClick"
+                                Content="Reset Identity"
+                                Foreground="{StaticResource StateErrorBrush}"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Padding="0"
+                                HorizontalAlignment="Left"/>
+                        <TextBlock Text="Forces re-TOFU on every exit on next connect. Admin must reset this device on each exit."
+                                   Foreground="{StaticResource TextTertiaryBrush}"
+                                   FontSize="12"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </PivotItem>
+
+            <!-- Discovery -->
+            <PivotItem>
+                <PivotItem.Header>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <FontIcon Glyph="&#xE774;" FontSize="14"/>
+                        <TextBlock Text="Discovery" FontSize="14"/>
+                    </StackPanel>
+                </PivotItem.Header>
+                <ScrollViewer>
+                    <StackPanel Spacing="16" Padding="20">
+                        <TextBlock Text="Vertices and edges are resolved via DNS SRV records from this domain. Set the domain and refresh — the engine re-resolves SRV + reprobes brokers without disconnecting."
+                                   Foreground="{StaticResource TextTertiaryBrush}"
+                                   FontSize="12"
+                                   TextWrapping="Wrap"/>
+
+                        <!-- Discovery domain editor -->
+                        <Border Background="{StaticResource BgSurfaceBrush}"
+                                BorderBrush="{StaticResource BorderSubtleBrush}"
+                                BorderThickness="0.5"
+                                CornerRadius="{StaticResource Vx_r_lg}"
+                                Padding="16">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0"
+                                           Text="Domain"
+                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,12,0"/>
+                                <!-- TextBox now that SetDiscoveryDomain IPC lands.
+                                     Refresh re-resolves the domain currently
+                                     persisted by the Service: edit + Tab/Enter
+                                     to commit, then Refresh to re-probe. -->
+                                <TextBox x:Name="DomainInput"
+                                         Grid.Column="1"
+                                         PlaceholderText="vertices.ru"
+                                         FontSize="14"
+                                         TextAlignment="Right"
+                                         VerticalAlignment="Center"
+                                         Background="Transparent"
+                                         BorderThickness="0"
+                                         Margin="0,0,12,0"
+                                         MaxLength="253"
+                                         KeyDown="OnDomainKeyDown"
+                                         LostFocus="OnDomainLostFocus"/>
+                                <Button Grid.Column="2"
+                                        Click="OnRefreshDiscoveryClick"
+                                        Content="Refresh"
+                                        Foreground="{StaticResource AccentPrimaryBrush}"
+                                        Background="Transparent"
+                                        BorderThickness="0"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Resolved Vertices section -->
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Vertices"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       FontSize="13"
+                                       FontWeight="SemiBold"/>
+                            <Border Background="{StaticResource BgSurfaceBrush}"
+                                    BorderBrush="{StaticResource BorderSubtleBrush}"
+                                    BorderThickness="0.5"
+                                    CornerRadius="{StaticResource Vx_r_lg}">
+                                <StackPanel x:Name="VerticesHost" Spacing="0">
+                                    <TextBlock x:Name="VerticesPlaceholder"
+                                               Text="Resolving discovery…"
+                                               Foreground="{StaticResource TextTertiaryBrush}"
+                                               FontSize="12"
+                                               Padding="16,12"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Resolved Edges section -->
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Edges"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       FontSize="13"
+                                       FontWeight="SemiBold"/>
+                            <Border Background="{StaticResource BgSurfaceBrush}"
+                                    BorderBrush="{StaticResource BorderSubtleBrush}"
+                                    BorderThickness="0.5"
+                                    CornerRadius="{StaticResource Vx_r_lg}">
+                                <StackPanel x:Name="EdgesHost" Spacing="0">
+                                    <TextBlock x:Name="EdgesPlaceholder"
+                                               Text="Resolving discovery…"
+                                               Foreground="{StaticResource TextTertiaryBrush}"
+                                               FontSize="12"
+                                               Padding="16,12"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </PivotItem>
+
+            <!-- Routing -->
+            <PivotItem>
+                <PivotItem.Header>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <FontIcon Glyph="&#xE89E;" FontSize="14"/>
+                        <TextBlock Text="Routing" FontSize="14"/>
+                    </StackPanel>
+                </PivotItem.Header>
+                <ScrollViewer>
+                    <StackPanel Spacing="6" Padding="20">
+                        <TextBlock Text="ROUTING"
+                                   Foreground="{StaticResource TextTertiaryBrush}"
+                                   FontSize="11"
+                                   CharacterSpacing="80"
+                                   Margin="4,0,0,0"/>
+
+                        <Border Background="{StaticResource BgSurfaceBrush}"
+                                BorderBrush="{StaticResource BorderSubtleBrush}"
+                                BorderThickness="0.5"
+                                CornerRadius="{StaticResource Vx_r_lg}">
+                            <StackPanel Spacing="0">
+
+                                <!-- Split toggle row -->
+                                <Grid Padding="16,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0"
+                                               Text="Split tunnel (RU direct)"
+                                               Foreground="{StaticResource TextPrimaryBrush}"
+                                               FontSize="14"
+                                               VerticalAlignment="Center"/>
+                                    <ToggleSwitch x:Name="SplitToggle"
+                                                  Grid.Column="1"
+                                                  Toggled="OnSplitToggled"
+                                                  OnContent=""
+                                                  OffContent=""
+                                                  MinWidth="0"
+                                                  VerticalAlignment="Center"/>
+                                </Grid>
+
+                                <Border Background="{StaticResource BorderSubtleBrush}" Height="0.5" Margin="16,0,0,0"/>
+
+                                <!-- Networks row -->
+                                <Grid Padding="16,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0"
+                                               Text="Networks"
+                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                               FontSize="14"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="RuNetsCountLine"
+                                               Grid.Column="1"
+                                               Text="—"
+                                               Foreground="{StaticResource TextPrimaryBrush}"
+                                               FontSize="14"
+                                               FontWeight="SemiBold"
+                                               TextAlignment="Right"
+                                               VerticalAlignment="Center"/>
+                                </Grid>
+
+                                <Border Background="{StaticResource BorderSubtleBrush}" Height="0.5" Margin="16,0,0,0"/>
+
+                                <!-- Updated row -->
+                                <Grid Padding="16,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0"
+                                               Text="Updated"
+                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                               FontSize="14"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="RuNetsSourceLine"
+                                               Grid.Column="1"
+                                               Text="—"
+                                               Foreground="{StaticResource TextPrimaryBrush}"
+                                               FontFamily="Consolas"
+                                               FontSize="13"
+                                               TextAlignment="Right"
+                                               VerticalAlignment="Center"/>
+                                </Grid>
+
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="RU subnets bypass the tunnel and go through your provider directly. Takes effect on next connect."
+                                   Foreground="{StaticResource TextTertiaryBrush}"
+                                   FontSize="12"
+                                   TextWrapping="Wrap"
+                                   Margin="4,8,0,0"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </PivotItem>
+
+            <!-- About -->
+            <PivotItem>
+                <PivotItem.Header>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <FontIcon Glyph="&#xE946;" FontSize="14"/>
+                        <TextBlock Text="About" FontSize="14"/>
+                    </StackPanel>
+                </PivotItem.Header>
+                <ScrollViewer>
+                    <StackPanel Spacing="12" Padding="20">
+                        <TextBlock Text="Vertex VPN"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   FontSize="20"
+                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="Where paths meet"
+                                   Foreground="{StaticResource TextTertiaryBrush}"
+                                   FontStyle="Italic"
+                                   FontSize="13"/>
+                        <TextBlock Text="Native Windows client for the Vertex graph."
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   FontSize="13"
+                                   TextWrapping="Wrap"/>
+
+                        <Border Background="{StaticResource BgSurfaceBrush}"
+                                BorderBrush="{StaticResource BorderSubtleBrush}"
+                                BorderThickness="0.5"
+                                CornerRadius="{StaticResource Vx_r_lg}"
+                                Padding="16">
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="HOW IT WORKS"
+                                           Foreground="{StaticResource TextTertiaryBrush}"
+                                           FontSize="11"
+                                           CharacterSpacing="80"/>
+                                <TextBlock Foreground="{StaticResource TextSecondaryBrush}"
+                                           FontSize="13"
+                                           TextWrapping="Wrap">
+                                    Vertex routes your device through a trusted network vertex —
+                                    a meeting point where edges converge. Every connection is
+                                    end-to-end protected with modern cryptography
+                                    (X25519 + ChaCha20-Poly1305); no relay along the path can
+                                    read or alter your data.
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <TextBlock x:Name="VersionLine"
+                                       Foreground="{StaticResource TextTertiaryBrush}"
+                                       FontFamily="Consolas"
+                                       FontSize="12"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock x:Name="ConfigLine"
+                                       Foreground="{StaticResource TextTertiaryBrush}"
+                                       FontFamily="Consolas"
+                                       FontSize="12"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <Button Click="OnDiagnosticsClick"
+                                Content="Open Diagnostics…"
+                                Foreground="{StaticResource AccentPrimaryBrush}"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Padding="0"
+                                HorizontalAlignment="Left"/>
+
+                        <TextBlock Text="© 2026 Mr. Kutin"
+                                   Foreground="{StaticResource TextTertiaryBrush}"
+                                   FontSize="11"
+                                   Margin="0,16,0,0"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </PivotItem>
+
+        </Pivot>
+    </Grid>
+</Window>

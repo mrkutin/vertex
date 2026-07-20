@@ -1,0 +1,13 @@
+[Match]
+Name=eth1
+
+[Link]
+RequiredForOnline=no
+
+[Network]
+Address=192.168.42.1/24
+ConfigureWithoutCarrier=yes
+LinkLocalAddressing=no
+DHCP=no
+# IP forwarding is set globally in /etc/sysctl.d/99-vtx-inline.conf (firewall phase),
+# not per-interface here (`IPForward=` deprecated since systemd 250+).

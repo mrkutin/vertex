@@ -1,0 +1,12 @@
+#!/bin/sh
+# pppd ip-down.d hook for Vertex R3S-inline.
+# Installed to /etc/ppp/ip-down.d/00-vtx-inline by install.sh.
+#
+# Invoked when pppoe0 goes down. We don't tear anything down: pppd persist+holdoff
+# will redial automatically, and vtx-gateway's MQTT auto-reconnect handles the
+# control-plane recovery. We just log for diagnostics.
+
+[ "$1" = "pppoe0" ] || exit 0
+
+logger -t vtx-inline "pppoe0 down"
+exit 0

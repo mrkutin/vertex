@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.18362.0</TargetPlatformMinVersion>
+    <SupportedOSPlatformVersion>10.0.18362.0</SupportedOSPlatformVersion>
+    <RootNamespace>Vertex.App</RootNamespace>
+    <AssemblyName>Vertex.App</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <UseWinUI>true</UseWinUI>
+    <EnableMsixTooling>true</EnableMsixTooling>
+    <WindowsPackageType>None</WindowsPackageType>
+    <!-- Bundle Windows App SDK runtime into the publish output so the MSI
+         is self-sufficient — no separate "Windows App Runtime 1.6"
+         installer prompt for the end user on a clean Windows 10/11 box. -->
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+    <Nullable>enable</Nullable>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <!--
+      Lets `dotnet restore` succeed on a non-Windows host (Mac builds the
+      solution for type-checking only; real publish happens on the VM).
+    -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <!-- WIN2D0001 fires on AnyCPU builds (CI / type-check on Mac); MSIX
+         publish always uses RuntimeIdentifiers (win-x64 / win-arm64) so
+         the dll resolves correctly. Suppressed for the dev build. -->
+    <Win2DWarnNoPlatform>false</Win2DWarnNoPlatform>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.*" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.*" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <!-- VertexHero animation — CanvasAnimatedControl + Win2D primitives. -->
+    <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.3.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vertex.Core\Vertex.Core.csproj" />
+    <ProjectReference Include="..\Vertex.Shared\Vertex.Shared.csproj" />
+  </ItemGroup>
+
+  <!-- Bundled RU CIDR aggregated zone — paritет с macOS / Android.
+       Shipped next to Vertex.App.exe so the Routing settings tab can
+       show counts before the Service has refreshed it. Both processes
+       (App + Service) share the same persistent copy at
+       %ProgramData%\Vertex\ru-aggregated.zone. -->
+  <ItemGroup>
+    <None Update="Resources\ru-aggregated.zone">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

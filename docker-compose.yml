@@ -1,0 +1,261 @@
+services:
+  mosquitto-1:
+    image: eclipse-mosquitto:2
+    volumes:
+      - ./test/docker/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./test/docker/acl:/mosquitto/config/acl-multi:ro
+      - ./test/docker/passwd:/mosquitto/config/passwd-multi
+    networks:
+      vpn:
+    restart: unless-stopped
+
+  mosquitto-2:
+    image: eclipse-mosquitto:2
+    volumes:
+      - ./test/docker/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./test/docker/acl:/mosquitto/config/acl-multi:ro
+      - ./test/docker/passwd:/mosquitto/config/passwd-multi
+    networks:
+      vpn:
+    restart: unless-stopped
+
+  exit-mtl:
+    build:
+      context: .
+      args:
+        PKG: ./server/cmd/exit
+    command:
+      - -brokers=mqtt://mosquitto-1:1883,mqtt://mosquitto-2:1883
+      - -id=mtl
+      - -tun-ip=10.9.0.1/24
+      - -user=vtx-exit-mtl
+      - -pass=test123
+
+      - -country=CA
+      - -max-clients=50
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    sysctls:
+      - net.ipv4.ip_forward=1
+    depends_on:
+      - mosquitto-1
+      - mosquitto-2
+    networks:
+      inet:
+      vpn:
+    restart: unless-stopped
+
+  exit-ams:
+    build:
+      context: .
+      args:
+        PKG: ./server/cmd/exit
+    command:
+      - -brokers=mqtt://mosquitto-1:1883,mqtt://mosquitto-2:1883
+      - -id=ams
+      - -tun-ip=10.9.1.1/24
+      - -user=vtx-exit-ams
+      - -pass=test123
+
+      - -country=NL
+      - -max-clients=50
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    sysctls:
+      - net.ipv4.ip_forward=1
+    depends_on:
+      - mosquitto-1
+      - mosquitto-2
+    networks:
+      inet:
+      vpn:
+    restart: unless-stopped
+
+  # Gateway (R3S router mode) — explicit exit=mtl, no routing (external vtx-proxy.sh)
+  gateway-r3s:
+    build:
+      context: .
+      args:
+        PKG: ./clients/gateway
+    command:
+      - -brokers=mqtt://mosquitto-1:1883,mqtt://mosquitto-2:1883
+      - -name=r3s
+      - -exit=mtl
+      - -pass=test123
+
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    dns:
+      - 8.8.8.8
+    depends_on:
+      - mosquitto-1
+      - mosquitto-2
+      - exit-mtl
+      - exit-ams
+    networks:
+      inet:
+      vpn:
+    restart: unless-stopped
+
+  # CLI client — explicit exit=mtl (simulates: vtx-client -exit mtl)
+  client-explicit-mtl:
+    build:
+      context: .
+      args:
+        PKG: ./clients/cli
+    command:
+      - -brokers=mqtt://mosquitto-1:1883,mqtt://mosquitto-2:1883
+      - -name=mac
+      - -exit=mtl
+      - -pass=test123
+
+      - -no-routing
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    volumes:
+      - ./test/docker/test-identity.key:/root/.config/vertex/identity.key:ro
+    dns:
+      - 8.8.8.8
+    depends_on:
+      - mosquitto-1
+      - mosquitto-2
+      - exit-mtl
+      - exit-ams
+    networks:
+      inet:
+      vpn:
+    profiles:
+      - explicit-mtl
+
+  # CLI client — explicit exit=ams (simulates: vtx-client -exit ams)
+  client-explicit-ams:
+    build:
+      context: .
+      args:
+        PKG: ./clients/cli
+    command:
+      - -brokers=mqtt://mosquitto-1:1883,mqtt://mosquitto-2:1883
+      - -name=mac
+      - -exit=ams
+      - -pass=test123
+
+      - -no-routing
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    volumes:
+      - ./test/docker/test-identity.key:/root/.config/vertex/identity.key:ro
+    dns:
+      - 8.8.8.8
+    depends_on:
+      - mosquitto-1
+      - mosquitto-2
+      - exit-mtl
+      - exit-ams
+    networks:
+      inet:
+      vpn:
+    profiles:
+      - explicit-ams
+
+  # CLI client — auto-select (no -exit flag, picks best by discovery score)
+  client-auto:
+    build:
+      context: .
+      args:
+        PKG: ./clients/cli
+    command:
+      - -brokers=mqtt://mosquitto-1:1883,mqtt://mosquitto-2:1883
+      - -name=auto
+      - -pass=test123
+
+      - -no-routing
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    dns:
+      - 8.8.8.8
+    depends_on:
+      - mosquitto-1
+      - mosquitto-2
+      - exit-mtl
+      - exit-ams
+    networks:
+      inet:
+      vpn:
+    profiles:
+      - auto-select
+
+  # Dedup test: exit pointed at ONE Mosquitto via TWO schemes (mqtt + ws).
+  # Pre-fix: opens 2 parallel client sessions, duplicates every publish.
+  # Post-fix: opens 1 session (group-by-host + autopaho ServerUrls failover).
+  exit-dedup:
+    build:
+      context: .
+      args:
+        PKG: ./server/cmd/exit
+    command:
+      - -brokers=mqtt://mosquitto-1:1883,ws://mosquitto-1:9001
+      - -id=mtl
+      - -tun-ip=10.9.0.1/24
+      - -user=vtx-exit-mtl
+      - -pass=test123
+      - -country=CA
+      - -max-clients=50
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    sysctls:
+      - net.ipv4.ip_forward=1
+    depends_on:
+      - mosquitto-1
+    networks:
+      vpn:
+    profiles:
+      - dedup-test
+
+  # CLI client — mixed mqtt:// + ws:// URLs (WSS fallback simulation)
+  client-ws-fallback:
+    build:
+      context: .
+      args:
+        PKG: ./clients/cli
+    command:
+      - -brokers=mqtt://mosquitto-1:1883,ws://mosquitto-1:9001,mqtt://mosquitto-2:1883,ws://mosquitto-2:9001
+      - -name=wss
+      - -exit=mtl
+      - -pass=test123
+      - -no-routing
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    dns:
+      - 8.8.8.8
+    depends_on:
+      - mosquitto-1
+      - mosquitto-2
+      - exit-mtl
+    networks:
+      inet:
+      vpn:
+    profiles:
+      - ws-fallback
+
+networks:
+  inet:
+    driver: bridge
+  vpn:
+    driver: bridge
+    internal: true

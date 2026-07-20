@@ -1,0 +1,32 @@
+[Unit]
+Description=Vertex inline: first-boot bootstrap web-UI
+Documentation=https://git.it-laboratory.com/mrkutin/vertex
+# LAN side must be up (eth1 has 192.168.42.1, dnsmasq serving DHCP) before
+# we listen on http://192.168.42.1/.
+After=vtx-inline-lan.service
+# BindsTo (stronger than Requires) — if vtx-inline-lan.service stops or fails
+# at any time, this unit stops too. We need the LAN IP (192.168.42.1) to be
+# alive; without it the bound listener is useless.
+BindsTo=vtx-inline-lan.service
+# Web-UI stays available across reboots so the user can re-configure when
+# moving the box to another ISP/network. The binary detects sentinel and
+# shows either the bootstrap form (first run) or the reconfigure form
+# (sentinel present, pre-filled with current non-secret values). Admin
+# ports remain blocked on WAN via vtx-inline-firewall — eth1-side only.
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/vtx-inline-setup
+# Web-UI stays running across reboots so the user can re-configure.
+# Restart=on-failure handles crashes; clean process exit no longer happens
+# (the self-disable goroutine was removed when the UI became persistent).
+Restart=on-failure
+RestartSec=3
+# Bootstrap needs to: bind :80, write /etc/vertex-inline/* and /etc/ppp/*,
+# call systemctl (D-Bus to systemd). Easiest is to run as root without
+# sandbox. NoNewPrivileges keeps the process from escalating beyond root
+# (e.g. via setuid binaries).
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=multi-user.target

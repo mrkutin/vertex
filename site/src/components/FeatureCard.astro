@@ -1,0 +1,59 @@
+---
+import Icon, { type IconName } from './Icon.astro';
+
+interface Props {
+  icon: IconName;
+  title: string;
+  desc: string;
+}
+
+const { icon, title, desc } = Astro.props;
+---
+
+<div class="vx-feat-card">
+  <div class="vx-feat-icon">
+    <Icon name={icon} size={24} strokeWidth={1.6} />
+  </div>
+  <h3>{title}</h3>
+  <p>{desc}</p>
+</div>
+
+<style>
+  .vx-feat-card {
+    border-radius: var(--vx-radius);
+    padding: 1.5rem;
+    background: var(--vx-bg-surface-elev);
+    border: 1px solid var(--vx-border-subtle);
+    transition: transform 200ms ease, border-color 200ms ease, background 200ms ease;
+    height: 100%;
+  }
+  .vx-feat-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--vx-border-strong);
+    background: var(--vx-bg-surface);
+  }
+
+  .vx-feat-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--vx-accent-soft);
+    color: var(--vx-accent);
+    margin-bottom: 1rem;
+  }
+
+  .vx-feat-card h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .vx-feat-card p {
+    color: var(--vx-text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+</style>

@@ -1,0 +1,25 @@
+[Unit]
+Description=Vertex inline: INPUT firewall (drop 22/80/443 from WAN)
+Documentation=https://git.it-laboratory.com/mrkutin/vertex
+# WAN must be up so $VTX_WAN_IFACE (pppoe0 or eth0) exists in sysfs and
+# iptables rules referencing it actually match traffic.
+After=vtx-inline-wan.service
+Requires=vtx-inline-wan.service
+# PartOf propagates restart from wan → firewall, so if pppoe0 disappears and
+# reappears (e.g., user changes WAN type), iptables rules referencing the WAN
+# iface get refreshed.
+PartOf=vtx-inline-wan.service
+# Apply firewall BEFORE router brings up VPN — closes the WAN-side admin
+# ports before any traffic can reach them.
+Before=vtx-inline-router.service
+ConditionPathExists=/etc/vertex-inline/inline.env
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+EnvironmentFile=/etc/vertex-inline/inline.env
+ExecStart=/usr/local/bin/vtx-inline-firewall.sh apply
+ExecStop=/usr/local/bin/vtx-inline-firewall.sh flush
+
+[Install]
+WantedBy=multi-user.target

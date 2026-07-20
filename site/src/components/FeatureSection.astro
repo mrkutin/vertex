@@ -1,0 +1,155 @@
+---
+import Icon, { type IconName } from './Icon.astro';
+
+interface Props {
+  icon: IconName;
+  heading: string;
+  body: string;
+  details: string[];
+  reverse?: boolean;
+  monoBlock?: string;
+}
+
+const { icon, heading, body, details, reverse = false, monoBlock } = Astro.props;
+
+type Segment = { type: 'text' | 'code'; value: string };
+
+function tokenize(input: string): Segment[] {
+  const segments: Segment[] = [];
+  const re = /`([^`]+)`/g;
+  let last = 0;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(input)) !== null) {
+    if (m.index > last) {
+      segments.push({ type: 'text', value: input.slice(last, m.index) });
+    }
+    segments.push({ type: 'code', value: m[1]! });
+    last = re.lastIndex;
+  }
+  if (last < input.length) {
+    segments.push({ type: 'text', value: input.slice(last) });
+  }
+  return segments;
+}
+---
+
+<section class="vx-feat-section" data-reverse={reverse ? 'true' : 'false'}>
+  <div class="vx-feat-icon-col">
+    <div class="vx-feat-icon-wrap" aria-hidden="true">
+      <Icon name={icon} size={48} strokeWidth={1.4} />
+    </div>
+  </div>
+  <div class="vx-feat-text-col">
+    <h2>{heading}</h2>
+    <p class="vx-feat-body">{body}</p>
+    <ul class="vx-feat-details" role="list">
+      {details.map((d) => (
+        <li>
+          <Icon name="check" size={16} strokeWidth={2} class="vx-feat-check" />
+          <span>
+            {tokenize(d).map((seg) =>
+              seg.type === 'code' ? <code>{seg.value}</code> : <Fragment>{seg.value}</Fragment>
+            )}
+          </span>
+        </li>
+      ))}
+    </ul>
+    {monoBlock && (
+      <pre class="vx-feat-mono"><code>{monoBlock}</code></pre>
+    )}
+  </div>
+</section>
+
+<style>
+  .vx-feat-section {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: clamp(2.5rem, 5vw, 4rem) 0;
+    border-bottom: 1px solid var(--vx-border-subtle);
+  }
+  .vx-feat-section:last-child {
+    border-bottom: 0;
+  }
+
+  @media (min-width: 768px) {
+    .vx-feat-section {
+      grid-template-columns: minmax(0, 200px) minmax(0, 1fr);
+      gap: 3rem;
+      align-items: start;
+    }
+    .vx-feat-section[data-reverse='true'] {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 200px);
+    }
+    .vx-feat-section[data-reverse='true'] .vx-feat-icon-col {
+      order: 2;
+    }
+    .vx-feat-section[data-reverse='true'] .vx-feat-text-col {
+      order: 1;
+    }
+  }
+
+  .vx-feat-icon-col {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+  .vx-feat-icon-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 96px;
+    height: 96px;
+    border-radius: 24px;
+    background: var(--vx-accent-soft);
+    color: var(--vx-accent);
+  }
+
+  .vx-feat-text-col h2 {
+    font-size: var(--vx-fs-h2);
+    letter-spacing: -0.015em;
+  }
+  .vx-feat-body {
+    margin-top: 1rem;
+    color: var(--vx-text-primary);
+    font-size: 1.05rem;
+    line-height: 1.65;
+  }
+  .vx-feat-details {
+    margin-top: 1.25rem;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .vx-feat-details li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.6rem;
+    color: var(--vx-text-secondary);
+    line-height: 1.5;
+  }
+  .vx-feat-check {
+    color: var(--vx-accent);
+    margin-top: 0.25rem;
+  }
+  .vx-feat-details code {
+    background: var(--vx-bg-surface);
+    border: 1px solid var(--vx-border-subtle);
+    color: var(--vx-accent);
+    padding: 0.05em 0.35em;
+    border-radius: 4px;
+    font-size: 0.88em;
+  }
+  .vx-feat-mono {
+    margin-top: 1.25rem;
+    background: var(--vx-bg-canvas-bottom);
+    border: 1px solid var(--vx-border-subtle);
+    border-radius: var(--vx-radius);
+    padding: 0.85rem 1rem;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: var(--vx-text-primary);
+  }
+</style>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- B2-2: V with edges extending past endpoint dots, becoming rays. White on black. -->
+  <rect width="1024" height="1024" fill="#000000"/>
+  <!-- Extended lines: start before top-left dot, end at vertex; mirror for right -->
+  <!-- Direction unit vector from (512,720) to (280,304) ≈ (-0.487, -0.873). Extend by 80 past (280,304): -->
+  <!-- (280 - 80*0.487, 304 - 80*0.873) ≈ (241, 234) -->
+  <line x1="241" y1="234" x2="512" y2="720" stroke="#FFFFFF" stroke-width="56" stroke-linecap="round"/>
+  <line x1="783" y1="234" x2="512" y2="720" stroke="#FFFFFF" stroke-width="56" stroke-linecap="round"/>
+  <circle cx="280" cy="304" r="48" fill="#FFFFFF"/>
+  <circle cx="744" cy="304" r="48" fill="#FFFFFF"/>
+  <circle cx="512" cy="720" r="68" fill="#FFFFFF"/>
+</svg>

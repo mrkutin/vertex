@@ -1,0 +1,416 @@
+/* ==========================================================================
+   Vertex global stylesheet
+   - Self-hosted Inter Variable + JetBrains Mono (woff2 in /public/fonts).
+   - Design tokens extracted from iOS Assets.xcassets.
+   - Theme is set on <html data-theme="..."> by an inline bootstrap script.
+     Fallback (script disabled) is also "dark" — see dark block below.
+   ========================================================================== */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---- Self-hosted fonts ---------------------------------------------------- */
+
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/Inter-Variable.woff2') format('woff2-variations');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url('/fonts/JetBrainsMono-Variable.woff2') format('woff2-variations');
+}
+
+/* ---- Design tokens -------------------------------------------------------- */
+
+/* Single source of truth: dark unless data-theme="light" is explicitly set. */
+:root[data-theme='dark'] {
+  --vx-bg-canvas: #080F26;
+  --vx-bg-canvas-top: #0B1238;
+  --vx-bg-canvas-bottom: #050918;
+  --vx-bg-surface: #101A3D;
+  --vx-bg-surface-elev: rgba(16, 26, 61, 0.72);
+  --vx-bg-surface-muted: rgba(16, 26, 61, 0.45);
+
+  --vx-accent: #7DB3FF;
+  --vx-accent-hover: #9CC4FF;
+  --vx-accent-soft: rgba(125, 179, 255, 0.18);
+
+  --vx-text-primary: #FFFFFF;
+  --vx-text-secondary: #C4D2EE;            /* solid, AA on canvas */
+  --vx-text-tertiary: #A0B2D7;             /* solid, ≥4.5:1 on #080F26 */
+  --vx-text-on-accent: #0B1638;
+
+  --vx-border-subtle: rgba(255, 255, 255, 0.08);
+  --vx-border-strong: rgba(255, 255, 255, 0.18);
+
+  --vx-state-connected: #7DB3FF;
+  --vx-state-warn: #FAD27A;
+  --vx-state-error: #FF6E78;
+
+  --vx-glow-primary: rgba(125, 179, 255, 0.35);
+
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --vx-bg-canvas: #F4F6FB;
+  --vx-bg-canvas-top: #FFFFFF;
+  --vx-bg-canvas-bottom: #E9EDF5;
+  --vx-bg-surface: #FFFFFF;
+  --vx-bg-surface-elev: rgba(255, 255, 255, 0.78);
+  --vx-bg-surface-muted: rgba(244, 246, 251, 0.7);
+
+  --vx-accent: #2E63C9;
+  --vx-accent-hover: #1F4FA8;
+  --vx-accent-soft: rgba(46, 99, 201, 0.12);
+
+  --vx-text-primary: #0B1638;
+  --vx-text-secondary: #3D4A6B;            /* AA on #F4F6FB */
+  --vx-text-tertiary: #4A5775;             /* tightened from #5A6884 → AA */
+  --vx-text-on-accent: #FFFFFF;
+
+  --vx-border-subtle: rgba(11, 22, 56, 0.08);
+  --vx-border-strong: rgba(11, 22, 56, 0.18);
+
+  --vx-state-connected: #2E63C9;
+  --vx-state-warn: #C78A1F;
+  --vx-state-error: #C73645;
+
+  --vx-glow-primary: rgba(46, 99, 201, 0.25);
+
+  color-scheme: light;
+}
+
+/* ---- Typography scale (fluid via clamp) ----------------------------------- */
+
+:root {
+  --vx-fs-display: clamp(2.6rem, 1.6rem + 4.2vw, 4.75rem);
+  --vx-fs-h1: clamp(2rem, 1.4rem + 2.6vw, 3rem);
+  --vx-fs-h2: clamp(1.5rem, 1.1rem + 1.6vw, 2.125rem);
+  --vx-fs-h3: clamp(1.18rem, 1rem + 0.7vw, 1.4rem);
+  --vx-fs-body: clamp(1rem, 0.96rem + 0.18vw, 1.0625rem);
+  --vx-fs-small: 0.875rem;
+  --vx-fs-mono: 0.85rem;
+
+  --vx-radius-sm: 6px;
+  --vx-radius: 12px;
+  --vx-radius-lg: 18px;
+  --vx-radius-xl: 28px;
+}
+
+/* ---- Modern reset (minimal, hand-rolled — not Tailwind preflight clone) -- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  font-size: 100%;
+}
+
+/* No-script fallback: ensure dark tokens apply if the theme bootstrap fails. */
+html:not([data-theme='light']):not([data-theme='dark']) {
+  --vx-bg-canvas: #080F26;
+  --vx-bg-canvas-top: #0B1238;
+  --vx-bg-canvas-bottom: #050918;
+  --vx-bg-surface: #101A3D;
+  --vx-bg-surface-elev: rgba(16, 26, 61, 0.72);
+  --vx-bg-surface-muted: rgba(16, 26, 61, 0.45);
+  --vx-accent: #7DB3FF;
+  --vx-accent-hover: #9CC4FF;
+  --vx-accent-soft: rgba(125, 179, 255, 0.18);
+  --vx-text-primary: #FFFFFF;
+  --vx-text-secondary: #C4D2EE;
+  --vx-text-tertiary: #A0B2D7;
+  --vx-text-on-accent: #0B1638;
+  --vx-border-subtle: rgba(255, 255, 255, 0.08);
+  --vx-border-strong: rgba(255, 255, 255, 0.18);
+  --vx-state-connected: #7DB3FF;
+  --vx-state-warn: #FAD27A;
+  --vx-state-error: #FF6E78;
+  --vx-glow-primary: rgba(125, 179, 255, 0.35);
+  color-scheme: dark;
+}
+
+body {
+  min-height: 100dvh;
+  font-family: 'Inter Variable', system-ui, -apple-system, sans-serif;
+  font-size: var(--vx-fs-body);
+  line-height: 1.55;
+  font-feature-settings: 'cv11', 'ss01', 'ss03';
+  background: var(--vx-bg-canvas);
+  color: var(--vx-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+h1 { font-size: var(--vx-fs-h1); }
+h2 { font-size: var(--vx-fs-h2); }
+h3 { font-size: var(--vx-fs-h3); }
+
+code,
+kbd,
+samp,
+pre {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: var(--vx-fs-mono);
+}
+
+::selection {
+  background: var(--vx-accent-soft);
+  color: var(--vx-text-primary);
+}
+
+:focus-visible {
+  outline: 2px solid var(--vx-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ---- Utility classes ------------------------------------------------------ */
+
+.vx-canvas-gradient {
+  background:
+    radial-gradient(ellipse at top, var(--vx-bg-canvas-top) 0%, transparent 60%),
+    linear-gradient(180deg, var(--vx-bg-canvas) 0%, var(--vx-bg-canvas-bottom) 100%);
+  background-attachment: fixed;
+}
+
+.vx-wordmark {
+  font-family: 'Inter Variable', system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.vx-container {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-inline: clamp(1rem, 1rem + 1.6vw, 2rem);
+}
+
+/* ---- Reduced motion ------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   .vx-prose — long-form MDX content typography
+   Used by DocLayout to wrap rendered <slot/>.
+   ========================================================================== */
+
+.vx-prose {
+  color: var(--vx-text-primary);
+  font-size: var(--vx-fs-body);
+  line-height: 1.7;
+}
+
+.vx-prose > * + * {
+  margin-top: 1.25em;
+}
+
+.vx-prose > h2 + *,
+.vx-prose > h3 + * {
+  margin-top: 0.85em;
+}
+
+.vx-prose h2 {
+  margin-top: 2.4em;
+  font-size: var(--vx-fs-h2);
+  letter-spacing: -0.015em;
+  scroll-margin-top: 96px;
+}
+
+.vx-prose h3 {
+  margin-top: 1.9em;
+  font-size: var(--vx-fs-h3);
+  scroll-margin-top: 96px;
+}
+
+.vx-prose h4 {
+  margin-top: 1.5em;
+  font-size: 1.05rem;
+  font-weight: 600;
+  scroll-margin-top: 96px;
+}
+
+.vx-prose p {
+  color: var(--vx-text-primary);
+}
+
+.vx-prose strong {
+  color: var(--vx-text-primary);
+  font-weight: 600;
+}
+
+.vx-prose em {
+  font-style: italic;
+}
+
+.vx-prose a {
+  color: var(--vx-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color 150ms ease;
+}
+.vx-prose a:hover,
+.vx-prose a:focus-visible {
+  color: var(--vx-accent-hover);
+}
+
+.vx-prose ul,
+.vx-prose ol {
+  padding-left: 1.4em;
+}
+.vx-prose ul { list-style: disc; }
+.vx-prose ol { list-style: decimal; }
+.vx-prose li {
+  margin-top: 0.4em;
+}
+.vx-prose li::marker {
+  color: var(--vx-text-tertiary);
+}
+
+.vx-prose blockquote {
+  margin: 1.6em 0;
+  padding: 0.85em 1.2em;
+  border-left: 3px solid var(--vx-accent);
+  background: var(--vx-bg-surface-muted);
+  border-radius: 0 var(--vx-radius-sm) var(--vx-radius-sm) 0;
+  color: var(--vx-text-primary);
+  font-size: 1.04rem;
+}
+.vx-prose blockquote p {
+  margin: 0;
+}
+.vx-prose blockquote strong {
+  color: var(--vx-accent);
+}
+
+.vx-prose code {
+  background: var(--vx-bg-surface);
+  color: var(--vx-accent);
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+  font-size: 0.88em;
+  border: 1px solid var(--vx-border-subtle);
+}
+
+.vx-prose pre {
+  margin: 1.5em 0;
+  padding: 1rem 1.1rem;
+  border-radius: var(--vx-radius);
+  background: var(--vx-bg-canvas-bottom);
+  border: 1px solid var(--vx-border-subtle);
+  overflow-x: auto;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: var(--vx-text-primary);
+}
+.vx-prose pre code {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+.vx-prose hr {
+  margin: 2.5em 0;
+  border: 0;
+  border-top: 1px solid var(--vx-border-subtle);
+}
+
+.vx-prose table {
+  width: 100%;
+  margin: 1.5em 0;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+.vx-prose th,
+.vx-prose td {
+  text-align: left;
+  padding: 0.6em 0.85em;
+  border-bottom: 1px solid var(--vx-border-subtle);
+}
+.vx-prose th {
+  font-weight: 600;
+  color: var(--vx-text-primary);
+  background: var(--vx-bg-surface-muted);
+}
+
+.vx-prose img {
+  border-radius: var(--vx-radius);
+  border: 1px solid var(--vx-border-subtle);
+}
